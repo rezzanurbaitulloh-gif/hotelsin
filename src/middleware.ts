@@ -27,11 +27,11 @@ export async function middleware(request: NextRequest) {
   const isAuth = path === '/login' || path === '/register'
   const isAccount = path.startsWith('/account')
 
-  // Fetch role if logged in
+  // Fetch role if logged in — public.users with fallback to auth metadata (RLS-safe)
   let role: string | null = null
   if (user?.email) {
     const { data: pubUser } = await supabase.from('users').select('role').eq('email', user.email).single()
-    role = pubUser?.role ?? null
+    role = (pubUser?.role as string) ?? (user.user_metadata as any)?.role ?? (user.app_metadata as any)?.role ?? null
   }
 
   // Admin guard — hanya CORE ROLE (admin) boleh masuk

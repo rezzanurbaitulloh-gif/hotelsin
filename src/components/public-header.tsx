@@ -36,9 +36,9 @@ export function PublicHeader() {
       setUser(u)
       if (u?.email) {
         const { data: pub } = await supabase.from('users').select('role').eq('email', u.email).single()
-        const r = pub?.role || null
+        const r = (pub?.role as string) || (u.user_metadata as any)?.role || (u.app_metadata as any)?.role || null
         setRole(r)
-        setIsCoreRole(['SUPER_ADMIN','HOTEL_ADMIN','FRONT_DESK','HOUSEKEEPING','REVENUE_MANAGER','CONTENT_MANAGER'].includes(r))
+        setIsCoreRole(['SUPER_ADMIN','HOTEL_ADMIN','FRONT_DESK','HOUSEKEEPING','REVENUE_MANAGER','CONTENT_MANAGER'].includes(r as string))
       }
     })
     const { data: { subscription } } = require('@/lib/supabase/client').createClient().auth.onAuthStateChange((_e:any, s:any)=>{
@@ -46,9 +46,9 @@ export function PublicHeader() {
       setUser(u)
       if (u?.email) {
         require('@/lib/supabase/client').createClient().from('users').select('role').eq('email', u.email).single().then(({data:pub}:any)=>{
-          const r = pub?.role || null
+          const r = (pub?.role as string) || (u.user_metadata as any)?.role || (u.app_metadata as any)?.role || null
           setRole(r)
-          setIsCoreRole(['SUPER_ADMIN','HOTEL_ADMIN','FRONT_DESK','HOUSEKEEPING','REVENUE_MANAGER','CONTENT_MANAGER'].includes(r))
+          setIsCoreRole(['SUPER_ADMIN','HOTEL_ADMIN','FRONT_DESK','HOUSEKEEPING','REVENUE_MANAGER','CONTENT_MANAGER'].includes(r as string))
         })
       } else {
         setRole(null); setIsCoreRole(false)
