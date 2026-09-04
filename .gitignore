@@ -40,3 +40,8 @@ seed2.mjs
 seed3.mjs
 !.env.example
 .tmp files
+create_auth_users.mjs
+setup_storage.mjs
+seed.mjs
+seed2.mjs
+seed3.mjs
