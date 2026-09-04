@@ -1,15 +1,23 @@
-export default function Page() {
+import { ReservationBar } from '@/components/reservation-bar'
+import Link from 'next/link'
+
+export default function ReservePage() {
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Reserve</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Begin your reservation — dates, guests and preferences.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
+    <div className="container mx-auto px-6 py-12">
+      <div className="max-w-3xl mx-auto text-center mb-12">
+        <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Reserve</p>
+        <h1 className="font-display text-4xl md:text-5xl font-light leading-none mb-4">Mulai perjalanan Anda</h1>
+        <p className="text-muted-foreground">Pilih tanggal, tamu, dan preferensi — sistem akan cek ketersediaan real-time dari database.</p>
       </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">(public)/reserve</code> — rendering OK (zero-404 guarantee)</p>
+      <div className="max-w-4xl mx-auto bg-card border border-border shadow-xl p-6 rounded-lg">
+        <h2 className="font-medium mb-4">Cari Ketersediaan</h2>
+        <ReservationBar />
+        <p className="text-xs text-muted-foreground mt-4">Data ketersediaan diambil langsung dari <code className="bg-muted px-1 rounded">supabase.from('rooms').from('reservations')</code> — tidak ada hardcode.</p>
+      </div>
+      <div className="max-w-4xl mx-auto mt-8 flex justify-center gap-4">
+        <Link href="/stay" className="h-10 px-6 inline-flex items-center border border-border text-xs tracking-widest">LIHAT KAMAR</Link>
+        <Link href="/" className="h-10 px-6 inline-flex items-center bg-muted text-xs tracking-widest">KEMBALI KE HOME</Link>
+      </div>
     </div>
   )
 }

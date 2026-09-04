@@ -1,15 +1,8 @@
-export default function Page() {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Gallery</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">A visual journal of architecture, nature and craft.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">(public)/gallery</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { createClient } from '@/lib/supabase/server'
+export const dynamic='force-dynamic'
+export default async function GalleryPage(){
+  const supabase=await createClient()
+  const {data}=await supabase.from('gallery_items').select('id,image_url,caption,category').eq('is_active',true).order('sort_order').limit(30)
+  if(!data?.length) return <div className="container mx-auto px-6 py-24 text-center text-muted-foreground">Galeri kosong — admin di /admin/website/gallery</div>
+  return (<div className="container mx-auto px-6 py-12"><p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Gallery</p><h1 className="font-display text-4xl font-light mb-8">Arsitektur & alam</h1><div className="columns-1 md:columns-3 gap-4 space-y-4">{data.map(g=> <div key={g.id} className="break-inside-avoid overflow-hidden rounded-lg bg-muted"><img src={g.image_url} alt={g.caption?.en||g.category} className="w-full object-cover"/><div className="p-3"><p className="text-xs text-muted-foreground">{g.category} • {g.caption?.en}</p></div></div>)}</div></div>)
 }

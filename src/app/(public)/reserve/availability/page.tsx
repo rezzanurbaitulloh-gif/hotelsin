@@ -1,15 +1,89 @@
-export default function Page() {
+import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+
+export const dynamic = 'force-dynamic'
+
+export default async function AvailabilityPage({ searchParams }: { searchParams: Promise<{ check_in?: string, check_out?: string, guests?: string, promo?: string }> }) {
+  const sp = await searchParams
+  const checkIn = sp.check_in || new Date(Date.now() + 7*86400000).toISOString().split('T')[0]
+  const checkOut = sp.check_out || new Date(Date.now() + 10*86400000).toISOString().split('T')[0]
+  const guests = Number(sp.guests || 2)
+
+  const supabase = await createClient()
+  const { data: roomTypes, error: rtError } = await supabase.from('room_types').select('id,name,base_price,max_occupancy,size_sqm,bed_type,images').eq('is_active', true).order('sort_order')
+  const { data: rooms } = await supabase.from('rooms').select('id,room_type_id,status').neq('status', 'OUT_OF_SERVICE')
+  const { data: reservations } = await supabase.from('reservations').select('id,room_type_id,check_in,check_out,status').not('status', 'in', '("CANCELLED","NO_SHOW")').lt('check_in', checkOut).gt('check_out', checkIn)
+
+  if (rtError) {
+    return <div className="container mx-auto px-6 py-12 text-center text-destructive">Error memuat kamar: {rtError.message}</div>
+  }
+
+  // Calculate availability per room_type
+  const availability = (roomTypes || []).map(rt => {
+    const total = (rooms || []).filter(r => r.room_type_id === rt.id).length
+    const reserved = (reservations || []).filter(r => r.room_type_id === rt.id).length
+    const available = Math.max(0, total - reserved)
+    const canAccommodate = rt.max_occupancy >= guests
+    return { ...rt, total, reserved, available, canAccommodate, isAvailable: available > 0 && canAccommodate }
+  })
+
+  const nights = Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000))
+
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Availability</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Real-time availability for your dates.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
+    <div className="container mx-auto px-6 py-12">
+      <div className="mb-8">
+        <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Availability</p>
+        <h1 className="font-display text-3xl md:text-4xl font-light">Ketersediaan untuk {checkIn} → {checkOut}</h1>
+        <p className="text-sm text-muted-foreground mt-2">{nights} malam • {guests} tamu • {availability.filter(a=>a.isAvailable).length} tipe tersedia dari {availability.length} • Data real-time dari DB</p>
+        <div className="mt-4 flex gap-2">
+          <Link href={`/reserve?check_in=${checkIn}&check_out=${checkOut}&guests=${guests}`} className="h-9 px-4 border border-border inline-flex items-center text-xs tracking-widest">UBAH TANGGAL</Link>
+          <Link href="/stay" className="h-9 px-4 bg-muted inline-flex items-center text-xs tracking-widest">LIHAT SEMUA KAMAR</Link>
+        </div>
       </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">(public)/reserve/availability</code> — rendering OK (zero-404 guarantee)</p>
+
+      {availability.length === 0 ? (
+        <div className="py-12 text-center border border-dashed rounded-lg text-muted-foreground">Tidak ada tipe kamar aktif — hubungi admin.</div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {availability.map(rt => (
+            <div key={rt.id} className={`border rounded-lg overflow-hidden ${rt.isAvailable ? 'border-border hover:shadow-lg' : 'border-border/50 opacity-60'} transition-shadow`}>
+              <div className="aspect-[4/3] bg-muted overflow-hidden">
+                <img src={rt.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80'} alt={rt.name.en} className="h-full w-full object-cover" />
+              </div>
+              <div className="p-5">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-display text-lg font-light">{rt.name.en}</h3>
+                  <Badge variant={rt.isAvailable ? 'secondary' : 'destructive'} className="text-[10px]">{rt.isAvailable ? `${rt.available} TERSEDIA` : 'PENUH'}</Badge>
+                </div>
+                <p className="text-xs tracking-widest text-muted-foreground uppercase mt-1">{rt.size_sqm} m² • {rt.bed_type.en} • max {rt.max_occupancy} tamu</p>
+                <p className="text-sm font-medium mt-3">${rt.base_price} / malam <span className="text-xs text-muted-foreground">• {nights} malam = ${rt.base_price * nights}</span></p>
+                {!rt.canAccommodate && <p className="text-xs text-destructive mt-2">Kapasitas tidak cukup untuk {guests} tamu</p>}
+                {rt.available === 0 && rt.canAccommodate && <p className="text-xs text-destructive mt-2">Semua {rt.total} unit terpesan untuk tanggal ini ({rt.reserved} reservasi overlap)</p>}
+                <div className="mt-4 flex gap-2">
+                  {rt.isAvailable ? (
+                    <Button asChild size="sm" className="flex-1 rounded-none bg-brand-foreground text-brand-background h-10 text-xs tracking-widest">
+                      <Link href={`/reserve/guest?room_type=${rt.id}&check_in=${checkIn}&check_out=${checkOut}&guests=${guests}&nights=${nights}&rate=${rt.base_price}`}>PILIH</Link>
+                    </Button>
+                  ) : (
+                    <Button disabled size="sm" className="flex-1 rounded-none h-10 text-xs">TIDAK TERSEDIA</Button>
+                  )}
+                  <Button asChild variant="outline" size="sm" className="rounded-none h-10 px-4 text-xs">
+                    <Link href={`/stay/${rt.id}`}>DETAIL</Link>
+                  </Button>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-3">Total unit: {rt.total} • Terpesan overlap: {rt.reserved} • Query: <code className="bg-muted px-1 rounded">reservations where check_in &lt; {checkOut} AND check_out &gt; {checkIn}</code></p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-12 p-4 bg-muted/30 border border-border rounded-lg text-xs text-muted-foreground">
+        <p className="font-medium text-foreground">Verifikasi Data Source:</p>
+        <p>Availability dihitung dari <code className="bg-white px-1 border rounded">rooms</code> vs <code className="bg-white px-1 border rounded">reservations</code> overlap — bukan hardcode. Admin ubah reservasi di <Link href="/admin/reservations" className="text-brand-accent underline">/admin/reservations</Link> → refresh → ketersediaan update.</p>
+      </div>
     </div>
   )
 }

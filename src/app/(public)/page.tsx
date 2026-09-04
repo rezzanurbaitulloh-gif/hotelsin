@@ -1,15 +1,31 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, MapPin, Utensils, Waves, Compass, Sparkles } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import { ReservationBar } from '@/components/reservation-bar'
 
-export default function HomePage() {
+export const dynamic = 'force-dynamic'
+
+export default async function HomePage() {
+  const supabase = await createClient()
+
+  // Fetch real data from Supabase — no hardcode
+  const [{ data: roomTypes }, { data: experiences }, { data: journalPosts }, { data: properties }] = await Promise.all([
+    supabase.from('room_types').select('id,name,description,base_price,max_occupancy,size_sqm,images,is_active').eq('is_active', true).order('sort_order').limit(3),
+    supabase.from('experiences').select('id,name,category,images').eq('is_active', true).order('sort_order').limit(4),
+    supabase.from('journal_posts').select('id,slug,title,category,cover_image_url').eq('status', 'PUBLISHED').order('published_at', { ascending: false }).limit(3),
+    supabase.from('properties').select('id,name,tagline,hero_image_url').limit(1),
+  ])
+
+  const heroImage = properties?.[0]?.hero_image_url || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1920&q=80&auto=format&fit=crop'
+
   return (
     <div className="flex flex-col">
       {/* HERO — Cinematic Fullscreen */}
       <section className="relative h-[100vh] min-h-[640px] flex items-center overflow-hidden bg-stone-900">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1920&q=80&auto=format&fit=crop"
+            src={heroImage}
             alt="HotelsIn — Tropical sanctuary at dusk"
             className="h-full w-full object-cover"
           />
@@ -44,36 +60,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* RESERVATION BAR — Floating Editorial */}
+      {/* RESERVATION BAR — Real Availability Engine */}
       <section className="relative z-20 -mt-12 container mx-auto px-6">
         <div className="bg-card border border-border shadow-xl max-w-6xl mx-auto">
-          <form className="grid grid-cols-2 md:grid-cols-5 divide-x divide-border">
-            <label className="p-5 flex flex-col gap-1 cursor-pointer hover:bg-muted/30 transition-colors">
-              <span className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">Arrival</span>
-              <input type="date" className="bg-transparent text-sm font-medium outline-none" defaultValue="2026-09-15" />
-              <span className="text-xs text-muted-foreground">Tue · Sep 15</span>
-            </label>
-            <label className="p-5 flex flex-col gap-1 cursor-pointer hover:bg-muted/30 transition-colors">
-              <span className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">Departure</span>
-              <input type="date" className="bg-transparent text-sm font-medium outline-none" defaultValue="2026-09-18" />
-              <span className="text-xs text-muted-foreground">Fri · Sep 18</span>
-            </label>
-            <label className="p-5 flex flex-col gap-1 cursor-pointer hover:bg-muted/30 transition-colors">
-              <span className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">Guests</span>
-              <span className="text-sm font-medium">2 Adults</span>
-              <span className="text-xs text-muted-foreground">1 Room</span>
-            </label>
-            <label className="p-5 hidden md:flex flex-col gap-1 cursor-pointer hover:bg-muted/30 transition-colors">
-              <span className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">Promo Code</span>
-              <input placeholder="Optional" className="bg-transparent text-sm placeholder:text-muted-foreground/50 outline-none" />
-              <span className="text-xs text-muted-foreground">&nbsp;</span>
-            </label>
-            <div className="col-span-2 md:col-span-1">
-              <button type="submit" className="w-full h-full bg-brand-foreground text-brand-background hover:bg-brand-foreground/90 transition-colors flex items-center justify-center gap-2 text-xs tracking-[0.2em] font-medium p-5">
-                CHECK AVAILABILITY <ArrowRight className="h-3 w-3" />
-              </button>
-            </div>
-          </form>
+          <ReservationBar />
         </div>
       </section>
 
@@ -112,7 +102,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ROOMS — Editorial Showcase */}
+      {/* ROOMS — Real DB Editorial Showcase */}
       <section className="py-24 md:py-32 bg-muted/30">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
@@ -125,51 +115,53 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-            {[
-              { name: 'Ocean Residence', m2: '380', guests: '4', price: '890', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80&auto=format&fit=crop' },
-              { name: 'Garden Villa', m2: '210', guests: '2', price: '520', img: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80&auto=format&fit=crop' },
-              { name: 'Cliff Villa', m2: '290', guests: '3', price: '680', img: 'https://images.unsplash.com/photo-1578683010236-d716f649c0d8?w=800&q=80&auto=format&fit=crop' },
-            ].map((room) => (
-              <Link key={room.name} href="/stay" className="group">
-                <div className="aspect-[4/3] overflow-hidden bg-muted mb-5">
-                  <img src={room.img} alt={room.name} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                </div>
-                <h3 className="font-display text-xl font-light mb-2 group-hover:text-brand-accent transition-colors">{room.name}</h3>
-                <p className="text-xs tracking-widest text-muted-foreground uppercase mb-3">{room.m2} m² · {room.guests} Guests · Private Pool</p>
-                <p className="text-sm"><span className="text-muted-foreground">From</span> <span className="font-medium">${room.price}</span> <span className="text-muted-foreground">/ night</span></p>
-              </Link>
-            ))}
-          </div>
+          {!roomTypes || roomTypes.length === 0 ? (
+            <div className="py-12 text-center border border-dashed border-border rounded-lg">
+              <p className="text-muted-foreground">No rooms available — check back soon or contact reservations.</p>
+              <Link href="/stay" className="inline-block mt-4 text-xs tracking-widest border-b border-brand-accent pb-1">BROWSE STAY</Link>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+              {roomTypes.map((room) => (
+                <Link key={room.id} href={`/stay/${room.id}`} className="group">
+                  <div className="aspect-[4/3] overflow-hidden bg-muted mb-5">
+                    <img src={room.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80&auto=format&fit=crop'} alt={room.name?.en || 'Room'} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  </div>
+                  <h3 className="font-display text-xl font-light mb-2 group-hover:text-brand-accent transition-colors">{room.name?.en || 'Villa'}</h3>
+                  <p className="text-xs tracking-widest text-muted-foreground uppercase mb-3">{room.size_sqm} m² · {room.max_occupancy} Guests · Private Pool</p>
+                  <p className="text-sm"><span className="text-muted-foreground">From</span> <span className="font-medium">${room.base_price}</span> <span className="text-muted-foreground">/ night</span></p>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* EXPERIENCES — Horizontal Editorial */}
+      {/* EXPERIENCES — Real DB Horizontal Editorial */}
       <section className="py-24 md:py-32">
         <div className="container mx-auto px-6">
           <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">Experiences</p>
           <h2 className="font-display text-4xl md:text-5xl font-light leading-none mb-12">Designed by <span className="italic">place</span></h2>
-          <div className="grid md:grid-cols-4 gap-6">
-            {[
-              { k: 'Dawn Temple Trek', cat: 'Culture', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80&auto=format&fit=crop' },
-              { k: 'Rice Terrace Cycling', cat: 'Nature', img: 'https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=600&q=80&auto=format&fit=crop' },
-              { k: 'Ayung River Rafting', cat: 'Adventure', img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80&auto=format&fit=crop' },
-              { k: 'Private Balinese Feast', cat: 'Culinary', img: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80&auto=format&fit=crop' },
-            ].map((e) => (
-              <Link key={e.k} href="/experiences" className="group">
-                <div className="aspect-[3/4] overflow-hidden bg-muted mb-4 relative">
-                  <img src={e.img} alt={e.k} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <span className="absolute bottom-4 left-4 text-[10px] tracking-[0.2em] text-white/80 uppercase border border-white/30 px-2 py-1 backdrop-blur">{e.cat}</span>
-                </div>
-                <h3 className="font-display text-lg font-light leading-tight group-hover:text-brand-accent transition-colors">{e.k}</h3>
-              </Link>
-            ))}
-          </div>
+          {!experiences || experiences.length === 0 ? (
+            <div className="py-12 text-center border border-dashed border-border rounded-lg text-muted-foreground">No experiences yet — our concierge is curating new journeys.</div>
+          ) : (
+            <div className="grid md:grid-cols-4 gap-6">
+              {experiences.map((e) => (
+                <Link key={e.id} href={`/experiences/${e.id}`} className="group">
+                  <div className="aspect-[3/4] overflow-hidden bg-muted mb-4 relative">
+                    <img src={e.images?.[0] || 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80&auto=format&fit=crop'} alt={e.name?.en || 'Experience'} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <span className="absolute bottom-4 left-4 text-[10px] tracking-[0.2em] text-white/80 uppercase border border-white/30 px-2 py-1 backdrop-blur">{e.category || 'Experience'}</span>
+                  </div>
+                  <h3 className="font-display text-lg font-light leading-tight group-hover:text-brand-accent transition-colors">{e.name?.en || 'Experience'}</h3>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* DINING & WELLNESS — Two Panels */}
+      {/* DINING & WELLNESS — Two Panels (static featured, but could be DB) */}
       <section className="grid md:grid-cols-2 gap-6 container mx-auto px-6 pb-24">
         <Link href="/dine" className="group relative aspect-[4/3] overflow-hidden bg-stone-900">
           <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&q=80&auto=format&fit=crop" alt="Dining at HotelsIn" className="absolute inset-0 h-full w-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
@@ -213,7 +205,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* JOURNAL TEASER */}
+      {/* JOURNAL TEASER — Real DB */}
       <section className="py-24 md:py-32">
         <div className="container mx-auto px-6">
           <div className="flex items-end justify-between mb-12">
@@ -225,21 +217,21 @@ export default function HomePage() {
               VIEW ALL <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { title: 'The Weaver of Sidemen', cat: 'Culture', img: 'https://images.unsplash.com/photo-1528164344705-47542687000d?w=700&q=80&auto=format&fit=crop' },
-              { title: 'A Guide to Balinese Offerings', cat: 'Wellness', img: 'https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=700&q=80&auto=format&fit=crop' },
-              { title: 'Architecture Without Air Conditioning', cat: 'Design', img: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=700&q=80&auto=format&fit=crop' },
-            ].map((post) => (
-              <Link key={post.title} href="/journal" className="group">
-                <div className="aspect-[4/3] overflow-hidden bg-muted mb-4">
-                  <img src={post.img} alt={post.title} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                </div>
-                <p className="text-[10px] tracking-[0.2em] text-brand-accent uppercase mb-2">{post.cat}</p>
-                <h3 className="font-display text-xl font-light leading-tight group-hover:text-brand-accent transition-colors">{post.title}</h3>
-              </Link>
-            ))}
-          </div>
+          {!journalPosts || journalPosts.length === 0 ? (
+            <div className="py-12 text-center border border-dashed border-border rounded-lg text-muted-foreground">Journal is being written — new stories from the valley soon.</div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-8">
+              {journalPosts.map((post) => (
+                <Link key={post.id} href={`/journal/${post.slug}`} className="group">
+                  <div className="aspect-[4/3] overflow-hidden bg-muted mb-4">
+                    <img src={post.cover_image_url || 'https://images.unsplash.com/photo-1528164344705-47542687000d?w=700&q=80&auto=format&fit=crop'} alt={post.title?.en || 'Journal'} className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  </div>
+                  <p className="text-[10px] tracking-[0.2em] text-brand-accent uppercase mb-2">{post.category || 'Journal'}</p>
+                  <h3 className="font-display text-xl font-light leading-tight group-hover:text-brand-accent transition-colors">{post.title?.en || 'Untitled'}</h3>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

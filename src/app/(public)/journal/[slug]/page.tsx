@@ -1,15 +1,11 @@
-export default function Page({ params }: { params: { slug?: string; id?: string } }) {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Journal Entry</h1>
-      <p className="text-xs tracking-widest text-muted-foreground uppercase mb-2">Slug / ID: {params.slug ?? params.id ?? '—'}</p>
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Editorial long-form from the HotelsIn journal.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">(public)/journal/[slug]</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+export const dynamic='force-dynamic'
+export default async function JournalDetail({params}:{params:Promise<{slug:string}>}){
+  const {slug}=await params
+  const supabase=await createClient()
+  const {data}=await supabase.from('journal_posts').select('id,title,excerpt,content,cover_image_url,category,author,published_at').eq('slug',slug).eq('status','PUBLISHED').single()
+  if(!data) return notFound()
+  return (<div className="container mx-auto px-6 py-12 max-w-3xl"><Link href="/journal" className="text-xs tracking-widest hover:text-brand-accent">← KEMBALI</Link><p className="text-xs tracking-[0.35em] text-brand-accent uppercase mt-8">{data.category} • {data.author}</p><h1 className="font-display text-4xl font-light mt-2">{data.title.en}</h1><p className="text-muted-foreground mt-4">{data.excerpt.en}</p><div className="aspect-[16/9] bg-muted rounded-lg overflow-hidden my-8"><img src={data.cover_image_url||'https://images.unsplash.com/photo-1528164344705-47542687000d?w=1200&q=80'} alt={data.title.en} className="h-full w-full object-cover"/></div><div className="prose prose-sm max-w-none text-muted-foreground leading-relaxed"><p>{data.content.en}</p></div></div>)
 }

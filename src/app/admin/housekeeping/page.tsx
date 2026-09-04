@@ -9,7 +9,7 @@ export default async function HousekeepingPage() {
   const rmap = Object.fromEntries((rooms||[]).map(r=>[r.id, r.room_number]))
   const cols = ['PENDING','IN_PROGRESS','INSPECTION','COMPLETED'] as const
   return (
-    <div className="space-y-6"><div className="flex items-center justify-between"><div><h1 className="font-display text-2xl font-light">Housekeeping</h1><p className="text-sm text-muted-foreground">Kanban by status • {data?.length||0} tasks</p></div><button className="h-9 px-4 bg-brand-foreground text-brand-background text-xs tracking-widest">+ NEW TASK</button></div>
+    <div className="space-y-6"><div className="flex items-center justify-between"><div><h1 className="font-display text-2xl font-light">Housekeeping</h1><p className="text-sm text-muted-foreground">Kanban by status • {data?.length||0} tasks</p></div><a href="/admin/housekeeping/new" className="h-9 px-4 bg-brand-foreground text-brand-background inline-flex items-center text-brand-background text-xs tracking-widest">+ NEW TASK</a></div>
       <div className="grid gap-4 md:grid-cols-4">
         {cols.map(col=> (
           <Card key={col} className="bg-muted/20"><CardHeader className="pb-2"><CardTitle className="text-xs tracking-widest uppercase">{col} • {(data||[]).filter(t=>t.status===col).length}</CardTitle></CardHeader>
