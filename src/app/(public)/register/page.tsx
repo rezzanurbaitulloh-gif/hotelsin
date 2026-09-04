@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function RegisterPage(){
   const router = useRouter()
@@ -17,6 +18,7 @@ export default function RegisterPage(){
   const [loading,setLoading]=useState(false)
   const [error,setError]=useState<string|null>(null)
   const [success,setSuccess]=useState(false)
+  const [showPassword,setShowPassword]=useState(false)
 
   const handleRegister = async (e:React.FormEvent)=>{
     e.preventDefault(); setLoading(true); setError(null)
@@ -43,7 +45,7 @@ export default function RegisterPage(){
               <div className="space-y-2"><Label>Nama Belakang</Label><Input value={lastName} onChange={e=>setLastName(e.target.value)} required/></div>
             </div>
             <div className="space-y-2"><Label>Email</Label><Input type="email" value={email} onChange={e=>setEmail(e.target.value)} required/></div>
-            <div className="space-y-2"><Label>Kata Sandi</Label><Input type="password" value={password} onChange={e=>setPassword(e.target.value)} required minLength={6}/><p className="text-xs text-muted-foreground">Minimal 6 karakter — untuk demo gunakan 121212</p></div>
+            <div className="space-y-2"><Label>Kata Sandi</Label><div className="relative"><Input type={showPassword ? 'text' : 'password'} value={password} onChange={e=>setPassword(e.target.value)} required minLength={6} className="pr-10"/><button type="button" onClick={()=> setShowPassword(!showPassword)} className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 grid place-items-center text-muted-foreground hover:text-foreground">{showPassword ? <EyeOff className="h-4 w-4"/> : <Eye className="h-4 w-4"/>}</button></div><p className="text-xs text-muted-foreground">Minimal 6 karakter — untuk demo gunakan 121212 • klik mata untuk lihat</p></div>
             {error && <p className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg">{error}</p>}
             <Button type="submit" disabled={loading} className="w-full bg-brand-foreground text-brand-background h-11 tracking-[0.15em] text-xs">{loading?'Memuat...':'DAFTAR'}</Button>
             <p className="text-xs text-center text-muted-foreground">Sudah punya akun? <Link href="/login" className="text-foreground underline">Masuk</Link></p>

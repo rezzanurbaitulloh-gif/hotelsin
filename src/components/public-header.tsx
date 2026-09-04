@@ -116,26 +116,52 @@ export function PublicHeader() {
               <Link href="/reserve">{t('nav.reserve')}</Link>
             </Button>
 
+            {!user ? (
+              <div className="hidden sm:flex items-center gap-2">
+                <Button asChild variant="outline" size="sm" className="h-9 px-5 rounded-none text-xs tracking-[0.15em]">
+                  <Link href="/login">MASUK</Link>
+                </Button>
+                <Button asChild size="sm" className="h-9 px-5 rounded-none bg-brand-foreground text-brand-background text-xs tracking-[0.15em]">
+                  <Link href="/register">DAFTAR</Link>
+                </Button>
+              </div>
+            ) : null}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 relative">
-                  <User className="h-4 w-4" />
+                <Button variant="ghost" size="icon" className="h-9 w-9 relative overflow-hidden">
+                  {user?.user_metadata?.avatar_url ? (
+                    <img src={user.user_metadata.avatar_url} alt="avatar" className="h-8 w-8 rounded-full object-cover" />
+                  ) : user ? (
+                    <span className="h-8 w-8 rounded-full bg-brand-accent text-white grid place-items-center text-xs font-medium">
+                      {(user.email?.[0] || 'U').toUpperCase()}
+                    </span>
+                  ) : (
+                    <User className="h-4 w-4" />
+                  )}
                   {isCoreRole && <span className="absolute -top-1 -right-1 h-2 w-2 bg-brand-accent rounded-full animate-pulse"/>}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 {!user ? (
                   <>
-                    <DropdownMenuItem asChild><Link href="/login" className="flex w-full items-center"><LogOut className="mr-2 h-4 w-4 rotate-180"/>Login</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link href="/register" className="flex w-full items-center"><User className="mr-2 h-4 w-4"/>Register</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/login" className="flex w-full items-center"><LogOut className="mr-2 h-4 w-4 rotate-180"/>Masuk</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/register" className="flex w-full items-center"><User className="mr-2 h-4 w-4"/>Daftar</Link></DropdownMenuItem>
+                    <p className="px-2 py-1 text-[10px] text-muted-foreground">Belum punya akun? Daftar sekarang</p>
                   </>
                 ) : (
                   <>
-                    <div className="px-2 py-2 border-b border-border mb-1">
-                      <p className="text-xs font-medium truncate">{user.email}</p>
-                      <p className="text-[10px] tracking-widest text-muted-foreground uppercase">{role || 'GUEST'} {isCoreRole && '• CORE'}</p>
+                    <div className="px-2 py-2 border-b border-border mb-1 flex items-center gap-3">
+                      {user?.user_metadata?.avatar_url ? (
+                        <img src={user.user_metadata.avatar_url} alt="avatar" className="h-8 w-8 rounded-full object-cover" />
+                      ) : (
+                        <span className="h-8 w-8 rounded-full bg-muted grid place-items-center"><User className="h-4 w-4"/></span>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium truncate">{user.email}</p>
+                        <p className="text-[10px] tracking-widest text-muted-foreground uppercase">{role || 'GUEST'} {isCoreRole && '• CORE'}</p>
+                      </div>
                     </div>
-                    <DropdownMenuItem asChild><Link href="/account/profile" className="flex w-full items-center"><User className="mr-2 h-4 w-4"/>{t('nav.account')}</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/account/profile" className="flex w-full items-center"><User className="mr-2 h-4 w-4"/>{t('nav.account')} — Avatar</Link></DropdownMenuItem>
                     <DropdownMenuItem asChild><Link href="/account/reservations" className="flex w-full items-center"><LayoutDashboard className="mr-2 h-4 w-4"/>My Reservations</Link></DropdownMenuItem>
                     {isCoreRole && (
                       <>
@@ -143,9 +169,6 @@ export function PublicHeader() {
                         <DropdownMenuItem asChild><Link href="/admin" className="flex w-full items-center text-brand-accent font-medium"><LayoutDashboard className="mr-2 h-4 w-4"/>Admin Dashboard</Link></DropdownMenuItem>
                         <p className="px-2 py-1 text-[10px] text-muted-foreground">Akses: {role}</p>
                       </>
-                    )}
-                    {!isCoreRole && user && (
-                      <p className="px-2 py-1 text-[10px] text-muted-foreground">Akun tamu — tidak ada akses admin</p>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={async ()=>{
@@ -233,7 +256,6 @@ export function PublicHeader() {
                   <Link href="/account/profile" onClick={()=> setMobileMenuOpen(false)} className="block py-2 text-sm border border-border text-center">AKUN SAYA</Link>
                   {isCoreRole && <Link href="/admin" onClick={()=> setMobileMenuOpen(false)} className="block py-2 text-sm bg-brand-accent text-white text-center">ADMIN DASHBOARD</Link>}
                   <button onClick={async ()=>{ const { createClient } = await import('@/lib/supabase/client'); await createClient().auth.signOut(); window.location.href='/'; setMobileMenuOpen(false)}} className="w-full py-2 text-sm border border-destructive text-destructive">LOGOUT</button>
-                  {!isCoreRole && <p className="text-[10px] text-muted-foreground text-center">Akun tamu tidak bisa akses dashboard admin</p>}
                 </>
               )}
             </div>

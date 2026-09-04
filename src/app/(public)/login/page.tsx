@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Eye, EyeOff } from 'lucide-react'
 
 
 function LoginForm(){
@@ -17,6 +18,7 @@ function LoginForm(){
   const [password, setPassword] = useState('121212')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleLogin = async (e: React.FormEvent)=>{
     e.preventDefault()
@@ -43,8 +45,13 @@ function LoginForm(){
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Kata Sandi</Label>
-        <Input id="password" type="password" value={password} onChange={e=> setPassword(e.target.value)} required placeholder="••••••••"/>
-        <p className="text-xs text-muted-foreground">Demo: admin@hotelsin.com / 121212 (atau manager@, frontdesk@, housekeeping@, revenue@, content@ — semua 121212)</p>
+        <div className="relative">
+          <Input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={e=> setPassword(e.target.value)} required placeholder="••••••••" className="pr-10"/>
+          <button type="button" onClick={()=> setShowPassword(!showPassword)} className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 grid place-items-center text-muted-foreground hover:text-foreground" aria-label={showPassword ? 'Sembunyikan' : 'Lihat'}>
+            {showPassword ? <EyeOff className="h-4 w-4"/> : <Eye className="h-4 w-4"/>}
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">Demo: admin@hotelsin.com / 121212 (atau manager@, frontdesk@, housekeeping@, revenue@, content@ — semua 121212) • klik ikon mata untuk lihat</p>
       </div>
       {error && <p className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg">{error}</p>}
       <Button type="submit" disabled={loading} className="w-full bg-brand-foreground text-brand-background hover:bg-brand-foreground/90 h-11 tracking-[0.15em] text-xs">
