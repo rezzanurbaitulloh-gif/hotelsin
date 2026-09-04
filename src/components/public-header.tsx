@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react'
+import { User, LogOut, LayoutDashboard } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
@@ -24,7 +24,6 @@ const navigation = [
 export function PublicHeader() {
   const pathname = usePathname()
   const { locale, currency, setLocale, setCurrency, t } = useI18n()
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
   const [user, setUser] = React.useState<any>(null)
   const [role, setRole] = React.useState<string | null>(null)
   const [isCoreRole, setIsCoreRole] = React.useState(false)
@@ -168,73 +167,9 @@ export function PublicHeader() {
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden h-9 w-9"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-expanded={mobileMenuOpen}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
           </div>
         </div>
       </div>
-
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-border bg-background animate-slide-down">
-          <div className="container mx-auto px-6 py-6 space-y-1">
-            {navigation.map((item) => (
-              <Link
-                key={item.key}
-                href={item.href as any}
-                className={cn(
-                  'block py-3 text-sm font-medium tracking-[0.15em] border-b border-border/50 last:border-0',
-                  pathname === item.href ? 'text-brand-accent' : 'text-muted-foreground'
-                )}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {t(`nav.${item.key.toLowerCase()}`)}
-              </Link>
-            ))}
-            <div className="pt-4">
-              <Select value={locale} onValueChange={(v) => { setLocale(v as typeof locale); setCurrency((v === 'id' ? 'IDR' : 'USD') as typeof currency) }}>
-                <SelectTrigger className="w-full h-9 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">ENGLISH — USD</SelectItem>
-                  <SelectItem value="id">INDONESIA — IDR</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-[10px] text-muted-foreground mt-2 text-center">Bahasa otomatis atur mata uang: ID→IDR, EN→USD</p>
-            </div>
-            <Button asChild className="w-full mt-3 rounded-none bg-brand-foreground text-brand-background h-11 tracking-[0.15em] text-xs">
-              <Link href="/reserve" onClick={() => setMobileMenuOpen(false)}>{t('nav.reserve')}</Link>
-            </Button>
-            <div className="pt-4 border-t border-border mt-4 space-y-2">
-              {!user ? (
-                <div className="grid grid-cols-2 gap-2">
-                  <Button asChild variant="outline" className="rounded-none h-10 text-xs tracking-widest"><Link href="/login" onClick={()=> setMobileMenuOpen(false)}>LOGIN</Link></Button>
-                  <Button asChild className="rounded-none h-10 text-xs tracking-widest bg-brand-foreground text-brand-background"><Link href="/register" onClick={()=> setMobileMenuOpen(false)}>REGISTER</Link></Button>
-                </div>
-              ) : (
-                <>
-                  <div className="text-xs p-3 bg-muted rounded-lg">
-                    <p className="font-medium truncate">{user.email}</p>
-                    <p className="text-[10px] tracking-widest text-muted-foreground uppercase">{role} {isCoreRole ? '• CORE ROLE' : '• GUEST'}</p>
-                  </div>
-                  <Link href="/account/profile" onClick={()=> setMobileMenuOpen(false)} className="block py-2 text-sm border border-border text-center">AKUN SAYA</Link>
-                  {isCoreRole && <Link href="/admin" onClick={()=> setMobileMenuOpen(false)} className="block py-2 text-sm bg-brand-accent text-white text-center">ADMIN DASHBOARD</Link>}
-                  <button onClick={async ()=>{ const { createClient } = await import('@/lib/supabase/client'); await createClient().auth.signOut(); window.location.href='/'; setMobileMenuOpen(false)}} className="w-full py-2 text-sm border border-destructive text-destructive">LOGOUT</button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </header>
   )
 }
