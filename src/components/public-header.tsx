@@ -86,32 +86,18 @@ export function PublicHeader() {
 
           <div className="flex items-center space-x-2 sm:space-x-3">
             <div className="hidden md:flex items-center gap-2">
-              <Select value={locale} onValueChange={(v) => setLocale(v as typeof locale)}>
-                <SelectTrigger className="w-[110px] h-9 bg-transparent border-border text-xs tracking-wider">
+              <Select value={locale} onValueChange={(v) => { setLocale(v as typeof locale); setCurrency((v === 'id' ? 'IDR' : 'USD') as typeof currency) }}>
+                <SelectTrigger className="w-[140px] h-9 bg-transparent border-border text-xs tracking-wider">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">ENGLISH</SelectItem>
-                  <SelectItem value="id">INDONESIA</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={currency} onValueChange={(v) => setCurrency(v as typeof currency)}>
-                <SelectTrigger className="w-[90px] h-9 bg-transparent border-border text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD</SelectItem>
-                  <SelectItem value="IDR">IDR</SelectItem>
+                  <SelectItem value="en">ENGLISH — USD</SelectItem>
+                  <SelectItem value="id">INDONESIA — IDR</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <ThemeToggle />
-            {isCoreRole && (
-              <Button asChild size="sm" className="hidden lg:inline-flex h-9 px-5 bg-brand-accent text-white hover:bg-brand-accent/90 text-xs tracking-[0.15em] rounded-none font-medium">
-                <Link href="/admin"><LayoutDashboard className="mr-2 h-3 w-3"/>DASHBOARD</Link>
-              </Button>
-            )}
             <Button asChild size="sm" className="hidden sm:inline-flex h-9 px-5 bg-brand-foreground text-brand-background hover:bg-brand-foreground/90 text-xs tracking-[0.15em] rounded-none font-medium">
               <Link href="/reserve">{t('nav.reserve')}</Link>
             </Button>
@@ -213,31 +199,18 @@ export function PublicHeader() {
                 {t(`nav.${item.key.toLowerCase()}`)}
               </Link>
             ))}
-            <div className="flex gap-2 pt-4">
-              <Select value={locale} onValueChange={(v) => setLocale(v as typeof locale)}>
-                <SelectTrigger className="flex-1 h-9 text-xs">
+            <div className="pt-4">
+              <Select value={locale} onValueChange={(v) => { setLocale(v as typeof locale); setCurrency((v === 'id' ? 'IDR' : 'USD') as typeof currency) }}>
+                <SelectTrigger className="w-full h-9 text-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">ENGLISH</SelectItem>
-                  <SelectItem value="id">INDONESIA</SelectItem>
+                  <SelectItem value="en">ENGLISH — USD</SelectItem>
+                  <SelectItem value="id">INDONESIA — IDR</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={currency} onValueChange={(v) => setCurrency(v as typeof currency)}>
-                <SelectTrigger className="flex-1 h-9 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD</SelectItem>
-                  <SelectItem value="IDR">IDR</SelectItem>
-                </SelectContent>
-              </Select>
+              <p className="text-[10px] text-muted-foreground mt-2 text-center">Bahasa otomatis atur mata uang: ID→IDR, EN→USD</p>
             </div>
-            {isCoreRole && (
-              <Button asChild className="w-full mt-3 rounded-none bg-brand-accent text-white h-11 tracking-[0.15em] text-xs">
-                <Link href="/admin" onClick={() => setMobileMenuOpen(false)}><LayoutDashboard className="mr-2 h-4 w-4 inline"/>DASHBOARD</Link>
-              </Button>
-            )}
             <Button asChild className="w-full mt-3 rounded-none bg-brand-foreground text-brand-background h-11 tracking-[0.15em] text-xs">
               <Link href="/reserve" onClick={() => setMobileMenuOpen(false)}>{t('nav.reserve')}</Link>
             </Button>
