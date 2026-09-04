@@ -18,7 +18,7 @@ export default async function HousekeepingPage() {
                 <div key={t.id} className="bg-card border border-border rounded-lg p-3 space-y-2">
                   <div className="flex items-center justify-between"><span className="font-mono text-xs font-medium">{rmap[t.room_id]||t.room_id.slice(0,6)}</span><Badge variant={t.priority==='HIGH'||t.priority==='URGENT'?'destructive':'secondary'} className="text-[10px]">{t.priority}</Badge></div>
                   <p className="text-xs text-muted-foreground line-clamp-2">{t.notes||'—'}</p>
-                  <div className="flex gap-1"><button className="h-7 flex-1 border border-border text-[10px] tracking-widest">MOVE</button><button className="h-7 flex-1 bg-muted text-[10px]">DONE</button></div>
+                  <div className="flex gap-1"><a href="/admin/housekeeping" className="h-7 flex-1 border border-border grid place-items-center text-[10px] tracking-widest hover:bg-muted">MOVE</a><a href="/admin/housekeeping" className="h-7 flex-1 bg-muted grid place-items-center text-[10px] hover:bg-muted/80">DONE</a></div>
                 </div>
               ))}
               {(data||[]).filter(t=>t.status===col).length===0 && <p className="text-xs text-muted-foreground py-8 text-center">Empty</p>}
