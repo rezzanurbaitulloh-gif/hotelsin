@@ -59,7 +59,7 @@ function Sidebar({ pathname, onNavigate }: { pathname: string; onNavigate?: () =
                   return (
                     <li key={item.href}>
                       <Link
-                        href={item.href}
+                        href={item.href as any}
                         onClick={onNavigate}
                         className={cn(
                           "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",

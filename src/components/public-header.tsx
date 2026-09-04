@@ -39,7 +39,7 @@ export function PublicHeader() {
             {navigation.map((item) => (
               <Link
                 key={item.key}
-                href={item.href}
+                href={item.href as any}
                 className={cn(
                   'text-xs font-medium tracking-[0.15em] transition-colors hover:text-brand-accent',
                   pathname === item.href || pathname.startsWith(item.href + '/')
@@ -132,7 +132,7 @@ export function PublicHeader() {
             {navigation.map((item) => (
               <Link
                 key={item.key}
-                href={item.href}
+                href={item.href as any}
                 className={cn(
                   'block py-3 text-sm font-medium tracking-[0.15em] border-b border-border/50 last:border-0',
                   pathname === item.href ? 'text-brand-accent' : 'text-muted-foreground'
