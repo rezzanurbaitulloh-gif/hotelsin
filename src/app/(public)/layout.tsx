@@ -71,7 +71,7 @@ export default async function PublicLayout({ children }: { children: ReactNode }
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-xs tracking-wider text-muted-foreground uppercase">© {new Date().getFullYear()} HotelsIn. All rights reserved.</p>
+            <p className="text-xs tracking-wider text-muted-foreground uppercase">© {new Date().getFullYear()} portoja. All rights reserved.</p>
             <div className="flex items-center space-x-6 text-xs tracking-wider">
               <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors uppercase">Privacy</Link>
               <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors uppercase">Terms</Link>
