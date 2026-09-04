@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
     role = pubUser?.role ?? null
   }
 
-  // Admin guard
+  // Admin guard — hanya CORE ROLE (admin) boleh masuk
   if (isAdmin) {
     if (!user) {
       const url = request.nextUrl.clone()
@@ -42,14 +42,15 @@ export async function middleware(request: NextRequest) {
       url.searchParams.set('next', path)
       return NextResponse.redirect(url)
     }
-    if (role && !canAccessAdminRoute(role as any, path)) {
+    // Jika tidak punya role di public.users → dianggap GUEST, block total
+    if (!role || !canAccessAdminRoute(role as any, path)) {
       const url = request.nextUrl.clone()
       url.pathname = '/'
+      // tambahkan flag biar UI bisa kasih toast (opsional)
+      url.searchParams.set('error', 'admin_only')
       return NextResponse.redirect(url)
     }
     if (isAdministrationRoute(path) && role !== 'SUPER_ADMIN' && role !== 'HOTEL_ADMIN') {
-      // only super/hotel can even see administration list, but HOTEL cannot write super
-      // For now block non-super/hotel entirely from administration
       const url = request.nextUrl.clone()
       url.pathname = '/admin'
       return NextResponse.redirect(url)

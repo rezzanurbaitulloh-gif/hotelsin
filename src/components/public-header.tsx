@@ -25,6 +25,37 @@ export function PublicHeader() {
   const pathname = usePathname()
   const { locale, currency, setLocale, setCurrency, t } = useI18n()
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false)
+  const [user, setUser] = React.useState<any>(null)
+  const [role, setRole] = React.useState<string | null>(null)
+  const [isCoreRole, setIsCoreRole] = React.useState(false)
+
+  React.useEffect(()=>{
+    const supabase = require('@/lib/supabase/client').createClient()
+    supabase.auth.getUser().then(async ({data}:{data:any})=>{
+      const u = data.user
+      setUser(u)
+      if (u?.email) {
+        const { data: pub } = await supabase.from('users').select('role').eq('email', u.email).single()
+        const r = pub?.role || null
+        setRole(r)
+        setIsCoreRole(['SUPER_ADMIN','HOTEL_ADMIN','FRONT_DESK','HOUSEKEEPING','REVENUE_MANAGER','CONTENT_MANAGER'].includes(r))
+      }
+    })
+    const { data: { subscription } } = require('@/lib/supabase/client').createClient().auth.onAuthStateChange((_e:any, s:any)=>{
+      const u = s?.user || null
+      setUser(u)
+      if (u?.email) {
+        require('@/lib/supabase/client').createClient().from('users').select('role').eq('email', u.email).single().then(({data:pub}:any)=>{
+          const r = pub?.role || null
+          setRole(r)
+          setIsCoreRole(['SUPER_ADMIN','HOTEL_ADMIN','FRONT_DESK','HOUSEKEEPING','REVENUE_MANAGER','CONTENT_MANAGER'].includes(r))
+        })
+      } else {
+        setRole(null); setIsCoreRole(false)
+      }
+    })
+    return ()=> subscription.unsubscribe()
+  }, [])
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -76,41 +107,56 @@ export function PublicHeader() {
             </div>
 
             <ThemeToggle />
+            {isCoreRole && (
+              <Button asChild size="sm" className="hidden lg:inline-flex h-9 px-5 bg-brand-accent text-white hover:bg-brand-accent/90 text-xs tracking-[0.15em] rounded-none font-medium">
+                <Link href="/admin"><LayoutDashboard className="mr-2 h-3 w-3"/>DASHBOARD</Link>
+              </Button>
+            )}
             <Button asChild size="sm" className="hidden sm:inline-flex h-9 px-5 bg-brand-foreground text-brand-background hover:bg-brand-foreground/90 text-xs tracking-[0.15em] rounded-none font-medium">
               <Link href="/reserve">{t('nav.reserve')}</Link>
             </Button>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9">
+                <Button variant="ghost" size="icon" className="h-9 w-9 relative">
                   <User className="h-4 w-4" />
+                  {isCoreRole && <span className="absolute -top-1 -right-1 h-2 w-2 bg-brand-accent rounded-full animate-pulse"/>}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link href="/account/profile" className="flex w-full items-center">
-                    <User className="mr-2 h-4 w-4" />
-                    {t('nav.account')}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/account/reservations" className="flex w-full items-center">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    My Reservations
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/admin" className="flex w-full items-center text-brand-accent">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Admin
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-destructive">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  {t('auth.logout')}
-                </DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-56">
+                {!user ? (
+                  <>
+                    <DropdownMenuItem asChild><Link href="/login" className="flex w-full items-center"><LogOut className="mr-2 h-4 w-4 rotate-180"/>Login</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/register" className="flex w-full items-center"><User className="mr-2 h-4 w-4"/>Register</Link></DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <div className="px-2 py-2 border-b border-border mb-1">
+                      <p className="text-xs font-medium truncate">{user.email}</p>
+                      <p className="text-[10px] tracking-widest text-muted-foreground uppercase">{role || 'GUEST'} {isCoreRole && '• CORE'}</p>
+                    </div>
+                    <DropdownMenuItem asChild><Link href="/account/profile" className="flex w-full items-center"><User className="mr-2 h-4 w-4"/>{t('nav.account')}</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/account/reservations" className="flex w-full items-center"><LayoutDashboard className="mr-2 h-4 w-4"/>My Reservations</Link></DropdownMenuItem>
+                    {isCoreRole && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild><Link href="/admin" className="flex w-full items-center text-brand-accent font-medium"><LayoutDashboard className="mr-2 h-4 w-4"/>Admin Dashboard</Link></DropdownMenuItem>
+                        <p className="px-2 py-1 text-[10px] text-muted-foreground">Akses: {role}</p>
+                      </>
+                    )}
+                    {!isCoreRole && user && (
+                      <p className="px-2 py-1 text-[10px] text-muted-foreground">Akun tamu — tidak ada akses admin</p>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={async ()=>{
+                      const { createClient } = await import('@/lib/supabase/client')
+                      await createClient().auth.signOut()
+                      window.location.href='/'
+                    }}>
+                      <LogOut className="mr-2 h-4 w-4"/>{t('auth.logout')}
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -164,9 +210,33 @@ export function PublicHeader() {
                 </SelectContent>
               </Select>
             </div>
-            <Button asChild className="w-full mt-4 rounded-none bg-brand-foreground text-brand-background h-11 tracking-[0.15em] text-xs">
+            {isCoreRole && (
+              <Button asChild className="w-full mt-3 rounded-none bg-brand-accent text-white h-11 tracking-[0.15em] text-xs">
+                <Link href="/admin" onClick={() => setMobileMenuOpen(false)}><LayoutDashboard className="mr-2 h-4 w-4 inline"/>DASHBOARD</Link>
+              </Button>
+            )}
+            <Button asChild className="w-full mt-3 rounded-none bg-brand-foreground text-brand-background h-11 tracking-[0.15em] text-xs">
               <Link href="/reserve" onClick={() => setMobileMenuOpen(false)}>{t('nav.reserve')}</Link>
             </Button>
+            <div className="pt-4 border-t border-border mt-4 space-y-2">
+              {!user ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <Button asChild variant="outline" className="rounded-none h-10 text-xs tracking-widest"><Link href="/login" onClick={()=> setMobileMenuOpen(false)}>LOGIN</Link></Button>
+                  <Button asChild className="rounded-none h-10 text-xs tracking-widest bg-brand-foreground text-brand-background"><Link href="/register" onClick={()=> setMobileMenuOpen(false)}>REGISTER</Link></Button>
+                </div>
+              ) : (
+                <>
+                  <div className="text-xs p-3 bg-muted rounded-lg">
+                    <p className="font-medium truncate">{user.email}</p>
+                    <p className="text-[10px] tracking-widest text-muted-foreground uppercase">{role} {isCoreRole ? '• CORE ROLE' : '• GUEST'}</p>
+                  </div>
+                  <Link href="/account/profile" onClick={()=> setMobileMenuOpen(false)} className="block py-2 text-sm border border-border text-center">AKUN SAYA</Link>
+                  {isCoreRole && <Link href="/admin" onClick={()=> setMobileMenuOpen(false)} className="block py-2 text-sm bg-brand-accent text-white text-center">ADMIN DASHBOARD</Link>}
+                  <button onClick={async ()=>{ const { createClient } = await import('@/lib/supabase/client'); await createClient().auth.signOut(); window.location.href='/'; setMobileMenuOpen(false)}} className="w-full py-2 text-sm border border-destructive text-destructive">LOGOUT</button>
+                  {!isCoreRole && <p className="text-[10px] text-muted-foreground text-center">Akun tamu tidak bisa akses dashboard admin</p>}
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

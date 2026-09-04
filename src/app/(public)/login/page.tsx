@@ -24,7 +24,14 @@ function LoginForm(){
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { setError(error.message); setLoading(false); return }
-    router.push(next)
+    // Verifikasi role inti vs guest
+    const { data: pub } = await supabase.from('users').select('role').eq('email', email).single()
+    const role = pub?.role || null
+    const isCore = ['SUPER_ADMIN','HOTEL_ADMIN','FRONT_DESK','HOUSEKEEPING','REVENUE_MANAGER','CONTENT_MANAGER'].includes(role||'')
+    // Jika core role dan next masih default, arahkan ke dashboard
+    const target = (isCore && next === '/account/profile') ? '/admin' : next
+    // Jika guest coba akses admin, akan di-block middleware → redirect ke / dengan error
+    router.push(target)
     router.refresh()
   }
 
