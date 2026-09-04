@@ -1,15 +1,31 @@
-export default function Page() {
+import { LiveMap } from '@/components/maps/live-map'
+import { getSiteSettings } from '@/lib/db/site-settings'
+export const dynamic = 'force-dynamic'
+export default async function DestinationPage(){
+  let maps:any = null
+  try { maps = await getSiteSettings('maps') } catch {}
+  const lat = maps?.lat ?? -8.5069, lng = maps?.lng ?? 115.2625, zoom = maps?.zoom ?? 13
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Destination</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">At the cultural heart of Bali — Ubud and beyond.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">(public)/destination</code> — rendering OK (zero-404 guarantee)</p>
+    <div className="flex flex-col">
+      <section className="relative h-[60vh] min-h-[400px] flex items-center bg-stone-900 overflow-hidden">
+        <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1920&q=80&auto=format&fit=crop" alt="Ubud destination" className="absolute inset-0 h-full w-full object-cover opacity-70"/>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"/>
+        <div className="relative container mx-auto px-6">
+          <p className="text-xs tracking-[0.35em] text-white/70 uppercase mb-4">Destination</p>
+          <h1 className="font-display text-5xl md:text-6xl font-light text-white leading-none">At the cultural<br/><span className="italic">heart</span> of Bali</h1>
+        </div>
+      </section>
+      <section className="py-16 container mx-auto px-6">
+        <div className="grid gap-8 md:grid-cols-3">
+          <div className="space-y-4"><h3 className="font-medium">7′ to Ubud Centre</h3><p className="text-sm text-muted-foreground">Royal palace, artisan villages, morning market with Chef Wayan.</p></div>
+          <div className="space-y-4"><h3 className="font-medium">35′ to Airport</h3><p className="text-sm text-muted-foreground">Ngurah Rai via new toll — private transfer included for suite guests.</p></div>
+          <div className="space-y-4"><h3 className="font-medium">Curated Experiences</h3><p className="text-sm text-muted-foreground">Temple blessings, Sidemen weavers, Ayung rafting — all private.</p></div>
+        </div>
+        <div className="mt-12">
+          <h2 className="font-display text-2xl font-light mb-4">Explore Live Map</h2>
+          <LiveMap lat={lat} lng={lng} zoom={zoom} markerTitle="HotelsIn — Ubud" />
+        </div>
+      </section>
     </div>
   )
 }

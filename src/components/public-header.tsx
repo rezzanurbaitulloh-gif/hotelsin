@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import { useI18n } from '@/lib/i18n'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 const navigation = [
   { key: 'stay', href: '/stay' },
@@ -74,6 +75,7 @@ export function PublicHeader() {
               </Select>
             </div>
 
+            <ThemeToggle />
             <Button asChild size="sm" className="hidden sm:inline-flex h-9 px-5 bg-brand-foreground text-brand-background hover:bg-brand-foreground/90 text-xs tracking-[0.15em] rounded-none font-medium">
               <Link href="/reserve">{t('nav.reserve')}</Link>
             </Button>

@@ -1,15 +1,19 @@
-export default function Page() {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Permissions</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Granular permission matrix.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/administration/permissions</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+const perms=[
+  'rooms.read','rooms.create','rooms.update','rooms.delete',
+  'reservations.read','reservations.create','reservations.update','reservations.cancel',
+  'guests.read','guests.create','guests.update','guests.delete',
+  'content.read','content.create','content.update','content.delete','content.publish',
+  'users.read','users.create','users.update','users.delete',
+  'revenue.read','revenue.manage','housekeeping.read','housekeeping.manage','maintenance.read','maintenance.manage','settings.read','settings.manage'
+]
+export default function PermissionsPage(){
+  return (<div className="space-y-6"><div><h1 className="font-display text-2xl font-light">Permissions</h1><p className="text-sm text-muted-foreground">Granular • server-side enforced in middleware + lib/rbac.ts</p></div>
+  <Card><CardHeader><CardTitle className="text-sm">All Permissions • {perms.length}</CardTitle></CardHeader><CardContent className="flex flex-wrap gap-2">
+    {perms.map(p=> <Badge key={p} variant="outline" className="font-mono text-xs">{p}</Badge>)}
+  </CardContent></Card>
+  <Card><CardContent className="py-4 text-xs text-muted-foreground">Check middleware.ts + rbac.ts → hasPermission(role, perm). SUPER always true. HOTEL inherits all lower.</CardContent></Card>
+  </div>)
 }

@@ -2,7 +2,7 @@ export const APP_CONFIG = {
   name: 'HotelsIn',
   tagline: 'A QUIETER WAY TO ARRIVE',
   description: 'A private sanctuary shaped by architecture, nature and time.',
-  defaultLocale: 'en' as const,
+  defaultLocale: 'id' as const,
   defaultCurrency: 'USD' as const,
   supportedLocales: ['en', 'id'] as const,
   supportedCurrencies: ['USD', 'IDR'] as const,

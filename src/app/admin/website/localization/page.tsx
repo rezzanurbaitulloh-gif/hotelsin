@@ -1,15 +1,12 @@
-export default function Page() {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Localization</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Manage translations and locales.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/website/localization</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+export default function LocalizationPage(){
+  const keys = ['nav.stay','hero.headline','rooms.from','booking.guest_details','admin.dashboard','common.save']
+  return (<div className="space-y-6"><div><h1 className="font-display text-2xl font-light">Localization</h1><p className="text-sm text-muted-foreground">English ↔ Indonesian • default id • affects navigation/hero/rooms/offers/journal/forms</p></div>
+  <Card><CardHeader><CardTitle className="text-sm">Translation Coverage</CardTitle></CardHeader><CardContent className="divide-y">
+    {keys.map(k=> <div key={k} className="grid grid-cols-3 gap-4 py-3 text-sm"><span className="font-mono text-xs">{k}</span><span>EN value…</span><span>ID value…</span></div>)}
+  </CardContent></Card>
+  <Card><CardContent className="py-8 text-center text-sm text-muted-foreground">Admin can edit both en/id for room_types.name, restaurants.name, offers.name, journal.title etc. Switch language in public header to verify.</CardContent></Card>
+  </div>)
 }

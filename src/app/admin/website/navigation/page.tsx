@@ -1,15 +1,20 @@
-export default function Page() {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Navigation CMS</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Labels, ordering and visibility.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/website/navigation</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+const nav = [
+  {label:'STAY', href:'/stay', order:1, visible:true},
+  {label:'DINE', href:'/dine', order:2, visible:true},
+  {label:'WELLNESS', href:'/wellness', order:3, visible:true},
+  {label:'EXPERIENCES', href:'/experiences', order:4, visible:true},
+  {label:'PROPERTY', href:'/property', order:5, visible:true},
+  {label:'OFFERS', href:'/offers', order:6, visible:true},
+  {label:'JOURNAL', href:'/journal', order:7, visible:true},
+]
+export default function NavigationCMSPage(){
+  return (<div className="space-y-6"><div><h1 className="font-display text-2xl font-light">Navigation CMS</h1><p className="text-sm text-muted-foreground">Labels, ordering, visibility • {nav.length} items • stored in site_settings key navigation</p></div>
+  <Card><CardHeader><CardTitle className="text-sm">Public Navigation</CardTitle></CardHeader><CardContent className="divide-y">
+    {nav.map(n=> <div key={n.href} className="flex items-center justify-between py-3"><div className="flex items-center gap-3"><span className="text-xs font-mono bg-muted px-2 py-1 rounded">#{n.order}</span><span className="font-medium text-sm">{n.label}</span><span className="text-xs text-muted-foreground">{n.href}</span></div><Badge variant={n.visible?'secondary':'outline'}>{n.visible?'Visible':'Hidden'}</Badge></div>)}
+  </CardContent></Card>
+  <Card><CardContent className="py-8 text-center text-sm text-muted-foreground">Drag to reorder (coming) • toggle visibility persists to DB (site_settings). Refresh public header to verify.</CardContent></Card>
+  </div>)
 }

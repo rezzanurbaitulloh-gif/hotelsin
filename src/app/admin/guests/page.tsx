@@ -1,15 +1,18 @@
-export default function Page() {
+import { createClient } from '@/lib/supabase/server'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+export default async function GuestsPage() {
+  const supabase = await createClient()
+  const { data } = await supabase.from('guests').select('id,first_name,last_name,email,city,country,vip_status,created_at').order('created_at',{ascending:false}).limit(50)
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Guests</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Guest directory with history and preferences.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/guests</code> — rendering OK (zero-404 guarantee)</p>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between"><div><h1 className="font-display text-2xl font-light">Guests</h1><p className="text-sm text-muted-foreground">{data?.length||0} guests • VIP highlighted</p></div><button className="h-9 px-4 bg-brand-foreground text-brand-background text-xs tracking-widest">+ NEW GUEST</button></div>
+      <Card><CardHeader><CardTitle className="text-sm">Guest Directory</CardTitle></CardHeader><CardContent className="overflow-x-auto">
+        <table className="w-full text-sm"><thead className="text-xs tracking-widest text-muted-foreground uppercase border-b"><tr><th className="text-left py-3">Name</th><th className="text-left">Email</th><th className="text-left">Location</th><th className="text-left">VIP</th><th className="text-left">Since</th></tr></thead>
+        <tbody>{(data||[]).map(g=> <tr key={g.id} className="border-b last:border-0 hover:bg-muted/30"><td className="py-3 font-medium">{g.first_name} {g.last_name}</td><td className="text-muted-foreground">{g.email}</td><td>{g.city}, {g.country}</td><td>{g.vip_status? <Badge className="bg-brand-accent text-white">VIP</Badge>: <span className="text-muted-foreground">—</span>}</td><td className="text-xs text-muted-foreground">{new Date(g.created_at).toLocaleDateString('id-ID')}</td></tr>)}
+        </tbody></table>
+      </CardContent></Card>
     </div>
   )
 }

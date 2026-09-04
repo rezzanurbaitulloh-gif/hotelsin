@@ -1,15 +1,13 @@
-export default function Page() {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Pages CMS</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Manage page sections and localization.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/website/pages</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { createClient } from '@/lib/supabase/server'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+export default async function PagesCMSPage(){
+  const supabase=await createClient()
+  const {data}=await supabase.from('page_sections').select('id,page_id,section_key,is_active').order('page_id').limit(30)
+  const grouped: Record<string, any[]> = (data||[]).reduce((acc:any,s:any)=>{ (acc[s.page_id]=acc[s.page_id]||[]).push(s); return acc;},{} as any)
+  return (<div className="space-y-6"><div><h1 className="font-display text-2xl font-light">Pages CMS</h1><p className="text-sm text-muted-foreground">{data?.length||0} sections across {Object.keys(grouped).length} pages</p></div>
+  {Object.entries(grouped).map(([page, secs])=> <Card key={page}><CardHeader><CardTitle className="text-sm capitalize">{page} • {(secs as any[]).length} sections</CardTitle></CardHeader><CardContent className="divide-y">{(secs as any[]).map((s:any)=> <div key={s.id} className="flex justify-between py-2 text-sm"><span className="font-mono text-xs">{s.section_key}</span><Badge variant={s.is_active?'secondary':'outline'}>{s.is_active?'Active':'Hidden'}</Badge></div>)}</CardContent></Card>)}
+  {!data?.length && <Card><CardContent className="py-12 text-center text-muted-foreground">No page sections</CardContent></Card>}
+  </div>)
 }

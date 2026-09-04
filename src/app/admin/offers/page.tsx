@@ -1,15 +1,11 @@
-export default function Page() {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Offers</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Manage dynamic offers and validity.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/offers</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { createClient } from '@/lib/supabase/server'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+export default async function OffersAdminPage(){
+  const supabase=await createClient()
+  const {data}=await supabase.from('offers').select('id,name,discount_type,discount_value,valid_from,valid_to,is_active').order('valid_from',{ascending:false}).limit(20)
+  return (<div className="space-y-6"><div className="flex items-center justify-between"><div><h1 className="font-display text-2xl font-light">Offers</h1><p className="text-sm text-muted-foreground">{data?.length||0} offers • discount engine live</p></div><button className="h-9 px-4 bg-brand-foreground text-brand-background text-xs tracking-widest">+ NEW OFFER</button></div>
+  <div className="grid gap-4 md:grid-cols-2">{(data||[]).map(o=> <Card key={o.id}><CardHeader className="pb-2"><CardTitle className="flex items-center justify-between text-sm"><span>{o.name.en}</span><Badge variant={o.is_active?'secondary':'outline'}>{o.is_active?'Active':'Expired'}</Badge></CardTitle></CardHeader><CardContent className="text-sm space-y-1"><p className="text-muted-foreground">{o.discount_type==='percentage'? o.discount_value+'% off' : '$'+o.discount_value+' off'}</p><p className="text-xs text-muted-foreground">{o.valid_from} → {o.valid_to}</p><div className="flex gap-2 pt-2"><button className="h-8 flex-1 bg-brand-foreground text-brand-background text-xs">EDIT</button><button className="h-8 flex-1 border border-border text-xs">DUPLICATE</button></div></CardContent></Card>)}</div>
+  </div>)
 }

@@ -1,15 +1,11 @@
-export default function Page() {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Wellness Admin</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Manage spa services.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/wellness</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { createClient } from '@/lib/supabase/server'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+export default async function WellnessAdminPage(){
+  const supabase=await createClient()
+  const {data}=await supabase.from('spa_services').select('id,name,price,duration_minutes,category,is_active').order('sort_order')
+  return (<div className="space-y-6"><div className="flex items-center justify-between"><div><h1 className="font-display text-2xl font-light">Wellness</h1><p className="text-sm text-muted-foreground">{data?.length||0} services • price & duration</p></div><button className="h-9 px-4 bg-brand-foreground text-brand-background text-xs tracking-widest">+ NEW SERVICE</button></div>
+  <Card><CardHeader><CardTitle className="text-sm">Spa Services</CardTitle></CardHeader><CardContent className="overflow-x-auto"><table className="w-full text-sm"><thead className="text-xs tracking-widest text-muted-foreground uppercase border-b"><tr><th className="text-left py-3">Service</th><th className="text-left">Category</th><th className="text-center">Duration</th><th className="text-right">Price</th><th className="text-center">Status</th></tr></thead><tbody>{(data||[]).map(s=> <tr key={s.id} className="border-b last:border-0 hover:bg-muted/30"><td className="py-3 font-medium">{s.name.en}</td><td><Badge variant="outline">{s.category}</Badge></td><td className="text-center">{s.duration_minutes}′</td><td className="text-right">${s.price}</td><td className="text-center"><Badge variant={s.is_active?'secondary':'outline'}>{s.is_active?'Active':'Draft'}</Badge></td></tr>)}</tbody></table></CardContent></Card>
+  </div>)
 }

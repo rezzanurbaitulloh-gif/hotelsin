@@ -1,15 +1,16 @@
-export default function Page() {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Homepage CMS</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Control hero, sections and featured content.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/website/homepage</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { createClient } from '@/lib/supabase/server'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+export default async function HomepageCMSPage(){
+  const supabase=await createClient()
+  const {data: sections}=await supabase.from('page_sections').select('id,section_key,section_type,content,is_active').eq('page_id','homepage').order('sort_order')
+  const {data: props}=await supabase.from('properties').select('id,name,hero_image_url').limit(1)
+  return (<div className="space-y-6"><div><h1 className="font-display text-2xl font-light">Homepage CMS</h1><p className="text-sm text-muted-foreground">Hero, brand statement, featured sections • {sections?.length||0} sections • property {props?.[0]?.name.en}</p></div>
+  <Card><CardHeader><CardTitle className="text-sm">Page Sections</CardTitle></CardHeader><CardContent className="divide-y">
+    {(sections||[]).map(s=> <div key={s.id} className="flex items-center justify-between py-3"><div><p className="font-medium text-sm">{s.section_key} <span className="text-xs text-muted-foreground">({s.section_type})</span></p><p className="text-xs text-muted-foreground line-clamp-1">{JSON.stringify(s.content).slice(0,120)}</p></div><Badge variant={s.is_active?'secondary':'outline'}>{s.is_active?'Active':'Hidden'}</Badge></div>)}
+    {!sections?.length && <p className="py-12 text-center text-muted-foreground">No sections — seed has hero + brand_statement. Add featured rooms/offers here.</p>}
+  </CardContent></Card>
+  <Card><CardHeader><CardTitle className="text-sm">Hero Preview</CardTitle></CardHeader><CardContent>{props?.[0]?.hero_image_url ? <img src={props[0].hero_image_url} alt="hero" className="w-full h-48 object-cover rounded-lg"/> : <p className="text-muted-foreground">No hero image</p>}</CardContent></Card>
+  </div>)
 }

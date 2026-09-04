@@ -1,15 +1,13 @@
-export default function Page() {
-  return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Gallery CMS</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Upload, reorder and categorize media.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
-      </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/website/gallery</code> — rendering OK (zero-404 guarantee)</p>
-    </div>
-  )
+import { createClient } from '@/lib/supabase/server'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+export default async function GalleryCMSPage(){
+  const supabase=await createClient()
+  const {data}=await supabase.from('gallery_items').select('id,image_url,category,sort_order,is_active').order('sort_order').limit(30)
+  return (<div className="space-y-6"><div className="flex items-center justify-between"><div><h1 className="font-display text-2xl font-light">Gallery CMS</h1><p className="text-sm text-muted-foreground">{data?.length||0} items • drag reorder, category, caption</p></div><button className="h-9 px-4 bg-brand-foreground text-brand-background text-xs tracking-widest">+ UPLOAD</button></div>
+  <div className="grid gap-3 md:grid-cols-4">
+    {(data||[]).map(g=> <Card key={g.id} className="overflow-hidden"><div className="aspect-[4/3] bg-muted overflow-hidden"><img src={g.image_url} alt={g.category} className="h-full w-full object-cover"/></div><CardContent className="p-3 flex items-center justify-between"><Badge variant="outline" className="text-[10px]">{g.category}</Badge><span className="text-xs text-muted-foreground">#{g.sort_order}</span></CardContent></Card>)}
+  </div>
+  </div>)
 }

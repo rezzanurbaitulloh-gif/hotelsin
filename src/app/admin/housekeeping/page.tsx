@@ -1,15 +1,31 @@
-export default function Page() {
+import { createClient } from '@/lib/supabase/server'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+export const dynamic='force-dynamic'
+export default async function HousekeepingPage() {
+  const supabase = await createClient()
+  const { data } = await supabase.from('housekeeping_tasks').select('id,room_id,status,priority,notes,created_at').order('created_at',{ascending:false}).limit(30)
+  const { data: rooms } = await supabase.from('rooms').select('id,room_number')
+  const rmap = Object.fromEntries((rooms||[]).map(r=>[r.id, r.room_number]))
+  const cols = ['PENDING','IN_PROGRESS','INSPECTION','COMPLETED'] as const
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center px-6 py-24 text-center">
-      <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-4">HotelsIn</p>
-      <h1 className="font-display text-4xl md:text-5xl font-light tracking-tight mb-4">Housekeeping</h1>
-      
-      <p className="text-muted-foreground max-w-xl leading-relaxed mb-8">Tasks by room with priority and timestamps.</p>
-      <div className="flex gap-3">
-        <a href="/" className="h-11 px-6 inline-flex items-center justify-center border border-border text-xs tracking-[0.15em] hover:bg-brand-foreground hover:text-brand-background hover:border-brand-foreground transition-colors">HOME</a>
-        <a href="/admin" className="h-11 px-6 inline-flex items-center justify-center bg-brand-foreground text-brand-background text-xs tracking-[0.15em] hover:bg-brand-foreground/90 transition-colors">ADMIN</a>
+    <div className="space-y-6"><div className="flex items-center justify-between"><div><h1 className="font-display text-2xl font-light">Housekeeping</h1><p className="text-sm text-muted-foreground">Kanban by status • {data?.length||0} tasks</p></div><button className="h-9 px-4 bg-brand-foreground text-brand-background text-xs tracking-widest">+ NEW TASK</button></div>
+      <div className="grid gap-4 md:grid-cols-4">
+        {cols.map(col=> (
+          <Card key={col} className="bg-muted/20"><CardHeader className="pb-2"><CardTitle className="text-xs tracking-widest uppercase">{col} • {(data||[]).filter(t=>t.status===col).length}</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              {(data||[]).filter(t=>t.status===col).map(t=> (
+                <div key={t.id} className="bg-card border border-border rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between"><span className="font-mono text-xs font-medium">{rmap[t.room_id]||t.room_id.slice(0,6)}</span><Badge variant={t.priority==='HIGH'||t.priority==='URGENT'?'destructive':'secondary'} className="text-[10px]">{t.priority}</Badge></div>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{t.notes||'—'}</p>
+                  <div className="flex gap-1"><button className="h-7 flex-1 border border-border text-[10px] tracking-widest">MOVE</button><button className="h-7 flex-1 bg-muted text-[10px]">DONE</button></div>
+                </div>
+              ))}
+              {(data||[]).filter(t=>t.status===col).length===0 && <p className="text-xs text-muted-foreground py-8 text-center">Empty</p>}
+            </CardContent>
+          </Card>
+        ))}
       </div>
-      <p className="mt-8 text-xs text-muted-foreground">Route: <code className="bg-muted px-2 py-1 rounded">admin/housekeeping</code> — rendering OK (zero-404 guarantee)</p>
     </div>
   )
 }
