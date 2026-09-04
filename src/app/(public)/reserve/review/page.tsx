@@ -38,13 +38,13 @@ export default async function ReviewPage({ searchParams }: { searchParams: Promi
     <div className="container mx-auto px-6 py-12 max-w-3xl">
       <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Review</p>
       <h1 className="font-display text-3xl font-light mb-2">Tinjau Pemesanan</h1>
-      <p className="text-sm text-muted-foreground mb-8">Pastikan detail benar — konfirmasi akan buat record real di DB.</p>
+      <p className="text-sm text-muted-foreground mb-8">Pastikan detail benar sebelum konfirmasi.</p>
 
       <div className="grid gap-6">
         <Card>
           <CardHeader><CardTitle className="text-sm">Ringkasan Menginap</CardTitle></CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <div className="flex justify-between"><span>Kamar</span><span className="font-medium">{roomType?.name?.en || roomTypeId.slice(0,8)}</span></div>
+            <div className="flex justify-between"><span>Kamar</span><span className="font-medium">{roomType?.name?.en || 'Kamar Pilihan'}</span></div>
             <div className="flex justify-between"><span>Tanggal</span><span>{checkIn} → {checkOut} • {nights} malam</span></div>
             <div className="flex justify-between"><span>Tamu</span><span>{guests}</span></div>
             <div className="flex justify-between"><span>Tamu Nama</span><span>{firstName} {lastName} • {email}</span></div>
@@ -59,18 +59,17 @@ export default async function ReviewPage({ searchParams }: { searchParams: Promi
             <div className="flex justify-between text-muted-foreground"><span>Pajak 11%</span><span>${tax}</span></div>
             <div className="flex justify-between text-muted-foreground"><span>Biaya Layanan 5%</span><span>${fee}</span></div>
             <div className="flex justify-between font-medium border-t border-border pt-2"><span>Total</span><span className="font-display text-lg">${total} USD</span></div>
-            <Badge variant="secondary" className="mt-2">Kalkulasi: rate×nights + tax + fee — dari DB, bukan hardcode</Badge>
+            <p className="text-xs text-muted-foreground mt-2">Rincian biaya transparan, termasuk pajak dan biaya layanan.</p>
           </CardContent>
         </Card>
 
         <Card className="bg-amber-50 border-amber-200">
           <CardContent className="pt-6 text-sm">
-            <p className="font-medium">Konfirmasi akan:</p>
+            <p className="font-medium">Setelah konfirmasi:</p>
             <ol className="list-decimal ml-5 mt-2 space-y-1 text-xs text-muted-foreground">
-              <li>Buat/update <code className="bg-white px-1 rounded">guests</code> (email {email})</li>
-              <li>Buat <code className="bg-white px-1 rounded">reservations</code> status <code>CONFIRMED</code> dengan <code>confirmation_code</code> unik</li>
-              <li>Buat <code className="bg-white px-1 rounded">transactions</code> <code>ROOM_REVENUE</code></li>
-              <li>Terlihat langsung di <Link href="/admin/reservations" className="text-brand-accent underline">/admin/reservations</Link> dan <Link href="/account/reservations" className="text-brand-accent underline">/account/reservations</Link></li>
+              <li>Reservasi Anda akan dikonfirmasi</li>
+              <li>Anda akan menerima kode konfirmasi</li>
+              <li>Reservasi dapat dilihat di akun Anda dan dikelola kapan saja</li>
             </ol>
           </CardContent>
         </Card>

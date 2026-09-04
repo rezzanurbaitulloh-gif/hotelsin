@@ -12,7 +12,7 @@ export default function ReservePage() {
       <div className="max-w-4xl mx-auto bg-card border border-border shadow-xl p-6 rounded-lg">
         <h2 className="font-medium mb-4">Cari Ketersediaan</h2>
         <ReservationBar />
-        <p className="text-xs text-muted-foreground mt-4">Data ketersediaan diambil langsung dari <code className="bg-muted px-1 rounded">supabase.from('rooms').from('reservations')</code> — tidak ada hardcode.</p>
+        <p className="text-xs text-muted-foreground mt-4">Ketersediaan diperbarui secara real-time.</p>
       </div>
       <div className="max-w-4xl mx-auto mt-8 flex justify-center gap-4">
         <Link href="/stay" className="h-10 px-6 inline-flex items-center border border-border text-xs tracking-widest">LIHAT KAMAR</Link>

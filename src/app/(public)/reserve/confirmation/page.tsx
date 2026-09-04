@@ -13,7 +13,6 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
   const checkOut = sp.check_out
   const guests = Number(sp.guests || 2)
   const nights = Number(sp.nights || 1)
-  const rate = Number(sp.rate || 0)
   const firstName = sp.first_name || 'Tamu'
   const lastName = sp.last_name || 'HotelsIn'
   const email = sp.email || `guest-${Date.now()}@example.com`
@@ -31,6 +30,10 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
   const { data: props } = await supabase.from('properties').select('id').limit(1)
   const propId = props?.[0]?.id
   if (!propId) return <div className="container mx-auto px-6 py-12 text-center text-destructive">Property belum di-setup</div>
+
+  // Server-side price validation — fetch rate from DB, ignore sp.rate (prevent manipulation)
+  const { data: rtForPrice } = await supabase.from('room_types').select('base_price').eq('id', roomTypeId).single()
+  const rate = rtForPrice?.base_price || 0
 
   // Check if already exists (idempotency) — look for recent reservation with same email+dates+room_type in last 10m
   const tenMinsAgo = new Date(Date.now() - 10*60*1000).toISOString()
@@ -57,7 +60,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
     guestId = newGuest.id
   }
 
-  // Calculate pricing
+  // Calculate pricing — server-side validated rate
   const subtotal = rate * nights
   const tax = Math.round(subtotal * 0.11)
   const fee = Math.round(subtotal * 0.05)
@@ -134,7 +137,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
       <div className="text-center mb-8">
         <CheckCircle className="h-12 w-12 text-emerald-500 mx-auto mb-4" />
         <h1 className="font-display text-4xl font-light">Reservasi Dikonfirmasi</h1>
-        <p className="text-sm text-muted-foreground mt-2">Record real telah dibuat di Supabase — refresh browser, data tetap ada.</p>
+        <p className="text-sm text-muted-foreground mt-2">Reservasi Anda telah dikonfirmasi — simpan kode untuk check-in.</p>
       </div>
 
       <Card>
@@ -149,9 +152,9 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
           </div>
           <div className="flex gap-3">
             <Link href={`/account/reservations/${reservation.id}`} className="flex-1 h-11 bg-brand-foreground text-brand-background grid place-items-center text-xs tracking-widest">LIHAT DI AKUN</Link>
-            <Link href="/admin/reservations" className="flex-1 h-11 border border-border grid place-items-center text-xs tracking-widest">LIHAT DI ADMIN</Link>
+            <Link href="/" className="flex-1 h-11 border border-border grid place-items-center text-xs tracking-widest">KEMBALI KE BERANDA</Link>
           </div>
-          <p className="text-[10px] text-muted-foreground text-center">Verifikasi: <code className="bg-muted px-1 rounded">SELECT * FROM reservations WHERE confirmation_code = '{reservation.confirmation_code}'</code> di Supabase Dashboard → Table Editor → reservations</p>
+          <p className="text-[10px] text-muted-foreground text-center">Simpan kode konfirmasi Anda untuk referensi check-in.</p>
         </CardContent>
       </Card>
 

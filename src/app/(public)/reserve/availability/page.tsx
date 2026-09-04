@@ -73,7 +73,7 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
                     <Link href={`/stay/${rt.id}`}>DETAIL</Link>
                   </Button>
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-3">Total unit: {rt.total} • Terpesan overlap: {rt.reserved} • Query: <code className="bg-muted px-1 rounded">reservations where check_in &lt; {checkOut} AND check_out &gt; {checkIn}</code></p>
+                <p className="text-[10px] text-muted-foreground mt-3">Total unit: {rt.total} • Terpesan: {rt.reserved}</p>
               </div>
             </div>
           ))}
@@ -81,8 +81,8 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
       )}
 
       <div className="mt-12 p-4 bg-muted/30 border border-border rounded-lg text-xs text-muted-foreground">
-        <p className="font-medium text-foreground">Verifikasi Data Source:</p>
-        <p>Availability dihitung dari <code className="bg-white px-1 border rounded">rooms</code> vs <code className="bg-white px-1 border rounded">reservations</code> overlap — bukan hardcode. Admin ubah reservasi di <Link href="/admin/reservations" className="text-brand-accent underline">/admin/reservations</Link> → refresh → ketersediaan update.</p>
+        <p className="font-medium text-foreground">Ketersediaan Terkini:</p>
+        <p>Availability is updated regularly to ensure accuracy.</p>
       </div>
     </div>
   )

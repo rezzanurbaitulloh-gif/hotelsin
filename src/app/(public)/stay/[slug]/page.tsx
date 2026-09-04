@@ -41,7 +41,7 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
           </div>
           <div className="space-y-6">
             <div>
-              <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Stay • {r.id.slice(0,8)}</p>
+              <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Stay</p>
               <h1 className="font-display text-4xl font-light leading-tight">{r.name?.en}</h1>
               <p className="text-sm tracking-widest text-muted-foreground uppercase mt-2">{r.short_description?.en}</p>
             </div>
@@ -52,15 +52,15 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
             </div>
             <div className="prose prose-sm max-w-none">
               <p className="text-muted-foreground leading-relaxed">{r.description?.en}</p>
-              <p className="text-xs text-muted-foreground mt-2">ID: {r.id} • Data dari Supabase room_types — admin edit di /admin/room-types</p>
+              <p className="text-xs text-muted-foreground mt-2">Detail kamar • Informasi terkini</p>
             </div>
             <div className="border-y border-border py-6 space-y-2">
               <div className="flex items-baseline gap-2">
                 <span className="font-display text-3xl">${r.base_price}</span>
                 <span className="text-sm text-muted-foreground">/ malam</span>
-                <Badge variant="secondary" className="ml-auto">From DB</Badge>
+                <Badge variant="secondary" className="ml-auto">Tersedia</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">Harga dinamis — admin ubah di database, langsung update di sini.</p>
+              <p className="text-xs text-muted-foreground">Harga terbaik dijamin untuk pemesanan langsung.</p>
             </div>
             <div className="flex gap-3">
               <Button asChild size="lg" className="flex-1 rounded-none bg-brand-foreground text-brand-background h-12 tracking-widest text-xs">
@@ -71,8 +71,8 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
               </Button>
             </div>
             <div className="p-4 bg-muted/30 border border-border rounded-lg">
-              <p className="text-xs tracking-widest uppercase mb-2">Data Source Verification</p>
-              <p className="text-xs text-muted-foreground">Halaman ini fetch <code className="bg-white px-1 border rounded">supabase.from('room_types').eq('id', slug)</code> — tidak ada hardcode. Coba admin ubah harga di /admin/room-types, refresh halaman ini, harga baru langsung muncul.</p>
+              <p className="text-xs tracking-widest uppercase mb-2">Kenyamanan Anda</p>
+              <p className="text-xs text-muted-foreground">Setiap detail dirancang untuk kenyamanan dan ketenangan Anda.</p>
             </div>
           </div>
         </div>

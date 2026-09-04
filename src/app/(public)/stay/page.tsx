@@ -49,7 +49,7 @@ export default async function StayPage({ searchParams }: { searchParams: Promise
       <div className="mb-8">
         <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Stay</p>
         <h1 className="font-display text-4xl md:text-5xl font-light leading-none mb-4">Residences shaped by<br/><span className="italic">landscape and light</span></h1>
-        <p className="text-muted-foreground max-w-2xl">Semua data kamar dari database Supabase — harga, kapasitas, ukuran, dan gambar dapat diubah admin tanpa ubah kode.</p>
+        <p className="text-muted-foreground max-w-2xl">Temukan tempat Anda — setiap villa dirancang untuk kenyamanan dan privasi.</p>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-8 border-y border-border py-4">
@@ -88,8 +88,8 @@ export default async function StayPage({ searchParams }: { searchParams: Promise
       </div>
 
       <div className="mt-12 p-6 bg-muted/30 border border-border rounded-lg">
-        <p className="text-xs tracking-widest text-muted-foreground uppercase mb-2">Data Source</p>
-        <p className="text-sm text-muted-foreground">Semua kamar di atas berasal dari <code className="bg-white px-2 py-1 rounded border">supabase.from('room_types')</code> — admin dapat CRUD di <Link href="/admin/room-types" className="text-brand-accent underline">/admin/room-types</Link> dan perubahan langsung tampil di sini tanpa deploy.</p>
+        <p className="text-xs tracking-widest text-muted-foreground uppercase mb-2">Kenyamanan Anda</p>
+        <p className="text-sm text-muted-foreground">Setiap villa dipilih dengan cermat untuk memastikan masa inap yang tak terlupakan.</p>
       </div>
     </div>
   )

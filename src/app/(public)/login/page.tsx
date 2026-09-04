@@ -70,8 +70,8 @@ function LoginForm(){
           <button type="button" onClick={()=> {setEmail('content@hotelsin.com'); setPassword('121212')}} className="border border-border p-2 rounded hover:bg-muted text-left">content@<br/>CONTENT</button>
         </div>
         <div className="mt-4 flex gap-2">
-          <Link href="/admin" className="flex-1 h-9 grid place-items-center border border-border text-xs tracking-widest hover:bg-muted">ADMIN DEMO</Link>
           <Link href="/" className="flex-1 h-9 grid place-items-center bg-muted text-xs tracking-widest">HOME</Link>
+          <Link href="/register" className="flex-1 h-9 grid place-items-center border border-border text-xs tracking-widest hover:bg-muted">DAFTAR</Link>
         </div>
       </div>
     </form>

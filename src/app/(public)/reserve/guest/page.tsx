@@ -34,7 +34,7 @@ export default async function GuestPage({ searchParams }: { searchParams: Promis
     <div className="container mx-auto px-6 py-12 max-w-3xl">
       <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Guest Details</p>
       <h1 className="font-display text-3xl font-light mb-2">Detail Tamu</h1>
-      <p className="text-sm text-muted-foreground mb-8">Kamar: {roomType?.name?.en || sp.room_type.slice(0,8)} • {sp.check_in} → {sp.check_out} • {sp.guests} tamu • ${rate}/malam • Subtotal ${subtotal}</p>
+      <p className="text-sm text-muted-foreground mb-8">Kamar: {roomType?.name?.en || 'Kamar Pilihan'} • {sp.check_in} → {sp.check_out} • {sp.guests} tamu • ${rate}/malam • Subtotal ${subtotal}</p>
 
       {!user && (
         <div className="mb-6 p-4 border border-amber-200 bg-amber-50 rounded-lg">
@@ -44,7 +44,7 @@ export default async function GuestPage({ searchParams }: { searchParams: Promis
       )}
 
       <Card>
-        <CardHeader><CardTitle className="text-sm">Form Tamu — Data akan disimpan ke guests & reservations (real DB)</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-sm">Form Tamu</CardTitle></CardHeader>
         <CardContent>
           <form action={`/reserve/review?room_type=${sp.room_type}&check_in=${sp.check_in}&check_out=${sp.check_out}&guests=${sp.guests}&nights=${sp.nights}&rate=${sp.rate}`} method="GET" className="space-y-4">
             <input type="hidden" name="room_type" value={sp.room_type} />
@@ -70,7 +70,7 @@ export default async function GuestPage({ searchParams }: { searchParams: Promis
               <Link href={`/reserve/availability?check_in=${sp.check_in}&check_out=${sp.check_out}&guests=${sp.guests}`} className="h-10 px-6 border border-border inline-flex items-center text-xs tracking-widest">KEMBALI</Link>
               <Button type="submit" className="flex-1 bg-brand-foreground text-brand-background h-10 tracking-widest text-xs">LANJUT KE REVIEW →</Button>
             </div>
-            <p className="text-[10px] text-muted-foreground">Dengan lanjut, data tamu akan dibuat/diupdate di <code className="bg-muted px-1 rounded">guests</code> dan reservasi di <code className="bg-muted px-1 rounded">reservations</code> pada konfirmasi.</p>
+            <p className="text-[10px] text-muted-foreground">Data Anda aman dan akan digunakan untuk konfirmasi reservasi.</p>
           </form>
         </CardContent>
       </Card>
