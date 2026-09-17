@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Users, Maximize, BedDouble } from 'lucide-react'
+import { Price } from '@/components/price'
+import { LocalizedText } from '@/components/localized'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,7 +31,7 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
         <div className="grid lg:grid-cols-2 gap-12">
           <div className="space-y-4">
             <div className="aspect-[4/3] overflow-hidden bg-muted rounded-lg">
-              <img src={r.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80&auto=format&fit=crop'} alt={r.name?.en} className="h-full w-full object-cover" />
+              <img src={r.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&q=80&auto=format&fit=crop'} alt={(r.name as any)?.en} className="h-full w-full object-cover" />
             </div>
             {r.images?.length > 1 && (
               <div className="grid grid-cols-3 gap-4">
@@ -42,22 +44,22 @@ export default async function RoomDetailPage({ params }: { params: Promise<{ slu
           <div className="space-y-6">
             <div>
               <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Stay</p>
-              <h1 className="font-display text-4xl font-light leading-tight">{r.name?.en}</h1>
-              <p className="text-sm tracking-widest text-muted-foreground uppercase mt-2">{r.short_description?.en}</p>
+              <h1 className="font-display text-4xl font-light leading-tight"><LocalizedText value={r.name} /></h1>
+              <p className="text-sm tracking-widest text-muted-foreground uppercase mt-2"><LocalizedText value={r.short_description} /></p>
             </div>
             <div className="flex flex-wrap gap-4 text-sm">
               <span className="inline-flex items-center gap-2 border border-border px-3 py-2"><Maximize className="h-4 w-4"/>{r.size_sqm} m²</span>
               <span className="inline-flex items-center gap-2 border border-border px-3 py-2"><Users className="h-4 w-4"/>{r.max_occupancy} Tamu</span>
-              <span className="inline-flex items-center gap-2 border border-border px-3 py-2"><BedDouble className="h-4 w-4"/>{r.bed_type?.en}</span>
+              <span className="inline-flex items-center gap-2 border border-border px-3 py-2"><BedDouble className="h-4 w-4"/><LocalizedText value={r.bed_type} /></span>
             </div>
             <div className="prose prose-sm max-w-none">
-              <p className="text-muted-foreground leading-relaxed">{r.description?.en}</p>
+              <p className="text-muted-foreground leading-relaxed"><LocalizedText value={r.description} /></p>
               <p className="text-xs text-muted-foreground mt-2">Detail kamar • Informasi terkini</p>
             </div>
             <div className="border-y border-border py-6 space-y-2">
               <div className="flex items-baseline gap-2">
-                <span className="font-display text-3xl">${r.base_price}</span>
-                <span className="text-sm text-muted-foreground">/ malam</span>
+                <span className="font-display text-3xl"><Price amount={r.base_price} /></span>
+                <span className="text-sm text-muted-foreground"><LocalizedText value={{ en: '/ night', id: '/ malam' }} /></span>
                 <Badge variant="secondary" className="ml-auto">Tersedia</Badge>
               </div>
               <p className="text-xs text-muted-foreground">Harga terbaik dijamin untuk pemesanan langsung.</p>

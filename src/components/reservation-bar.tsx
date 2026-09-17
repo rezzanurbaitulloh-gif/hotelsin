@@ -6,7 +6,8 @@ import { useI18n } from '@/lib/i18n'
 
 export function ReservationBar() {
   const router = useRouter()
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const dateLocale = locale === 'id' ? 'id-ID' : 'en-US'
   const [arrival, setArrival] = useState(() => {
     const d = new Date()
     d.setDate(d.getDate() + 7)
@@ -36,19 +37,19 @@ export function ReservationBar() {
       <label className="p-5 flex flex-col gap-1 cursor-pointer hover:bg-muted/30 transition-colors">
         <span className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{t('reservation.arrival')}</span>
         <input type="date" value={arrival} onChange={e=> setArrival(e.target.value)} className="bg-transparent text-sm font-medium outline-none" required />
-        <span className="text-xs text-muted-foreground">{new Date(arrival).toLocaleDateString('id-ID', { weekday:'short', day:'numeric', month:'short' })}</span>
+        <span className="text-xs text-muted-foreground">{new Date(arrival).toLocaleDateString(dateLocale, { weekday:'short', day:'numeric', month:'short' })}</span>
       </label>
       <label className="p-5 flex flex-col gap-1 cursor-pointer hover:bg-muted/30 transition-colors">
         <span className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{t('reservation.departure')}</span>
         <input type="date" value={departure} onChange={e=> setDeparture(e.target.value)} className="bg-transparent text-sm font-medium outline-none" required />
-        <span className="text-xs text-muted-foreground">{new Date(departure).toLocaleDateString('id-ID', { weekday:'short', day:'numeric', month:'short' })}</span>
+        <span className="text-xs text-muted-foreground">{new Date(departure).toLocaleDateString(dateLocale, { weekday:'short', day:'numeric', month:'short' })}</span>
       </label>
       <label className="p-5 flex flex-col gap-1 cursor-pointer hover:bg-muted/30 transition-colors">
         <span className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{t('reservation.guests')}</span>
         <select value={guests} onChange={e=> setGuests(Number(e.target.value))} className="bg-transparent text-sm font-medium outline-none">
-          {[1,2,3,4,6,8].map(n=> <option key={n} value={n}>{n} {n===1?'Guest':'Guests'}</option>)}
+          {[1,2,3,4,6,8].map(n=> <option key={n} value={n}>{n} {locale==='id' ? (n===1?'Tamu':'Tamu') : (n===1?'Guest':'Guests')}</option>)}
         </select>
-        <span className="text-xs text-muted-foreground">1 Room</span>
+        <span className="text-xs text-muted-foreground">{locale==='id' ? '1 Kamar' : '1 Room'}</span>
       </label>
       <label className="p-5 hidden md:flex flex-col gap-1 cursor-pointer hover:bg-muted/30 transition-colors">
         <span className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{t('reservation.promo')}</span>

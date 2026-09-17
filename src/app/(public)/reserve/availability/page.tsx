@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Price } from '@/components/price'
+import { LocalizedText } from '@/components/localized'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +22,6 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
     return <div className="container mx-auto px-6 py-12 text-center text-destructive">Error memuat kamar: {rtError.message}</div>
   }
 
-  // Calculate availability per room_type
   const availability = (roomTypes || []).map(rt => {
     const total = (rooms || []).filter(r => r.room_type_id === rt.id).length
     const reserved = (reservations || []).filter(r => r.room_type_id === rt.id).length
@@ -50,15 +51,15 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
           {availability.map(rt => (
             <div key={rt.id} className={`border rounded-lg overflow-hidden ${rt.isAvailable ? 'border-border hover:shadow-lg' : 'border-border/50 opacity-60'} transition-shadow`}>
               <div className="aspect-[4/3] bg-muted overflow-hidden">
-                <img src={rt.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80'} alt={rt.name.en} className="h-full w-full object-cover" />
+                <img src={rt.images?.[0] || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80'} alt={(rt.name as any)?.en} className="h-full w-full object-cover" />
               </div>
               <div className="p-5">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-display text-lg font-light">{rt.name.en}</h3>
+                  <h3 className="font-display text-lg font-light"><LocalizedText value={rt.name as any} /></h3>
                   <Badge variant={rt.isAvailable ? 'secondary' : 'destructive'} className="text-[10px]">{rt.isAvailable ? `${rt.available} TERSEDIA` : 'PENUH'}</Badge>
                 </div>
-                <p className="text-xs tracking-widest text-muted-foreground uppercase mt-1">{rt.size_sqm} m² • {rt.bed_type.en} • max {rt.max_occupancy} tamu</p>
-                <p className="text-sm font-medium mt-3">${rt.base_price} / malam <span className="text-xs text-muted-foreground">• {nights} malam = ${rt.base_price * nights}</span></p>
+                <p className="text-xs tracking-widest text-muted-foreground uppercase mt-1">{rt.size_sqm} m² • <LocalizedText value={rt.bed_type as any} /> • max {rt.max_occupancy} tamu</p>
+                <p className="text-sm font-medium mt-3"><Price amount={rt.base_price} showRate /> <span className="text-xs text-muted-foreground">• {nights} malam = <Price amount={rt.base_price * nights} /></span></p>
                 {!rt.canAccommodate && <p className="text-xs text-destructive mt-2">Kapasitas tidak cukup untuk {guests} tamu</p>}
                 {rt.available === 0 && rt.canAccommodate && <p className="text-xs text-destructive mt-2">Semua {rt.total} unit terpesan untuk tanggal ini ({rt.reserved} reservasi overlap)</p>}
                 <div className="mt-4 flex gap-2">

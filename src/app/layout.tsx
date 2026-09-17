@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Playfair_Display, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { getI18nFromCookies } from "@/lib/i18n/server";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -59,11 +60,12 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const { locale, currency } = await getI18nFromCookies()
   return (
-    <html lang="en" className={`${playfair.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+    <html lang={locale} className={`${playfair.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Providers>{children}</Providers>
+        <Providers initialLocale={locale} initialCurrency={currency}>{children}</Providers>
       </body>
     </html>
   );

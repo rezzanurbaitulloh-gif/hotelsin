@@ -3,7 +3,7 @@ export const APP_CONFIG = {
   tagline: 'A QUIETER WAY TO ARRIVE',
   description: 'A private sanctuary shaped by architecture, nature and time.',
   defaultLocale: 'id' as const,
-  defaultCurrency: 'USD' as const,
+  defaultCurrency: 'IDR' as const,
   supportedLocales: ['en', 'id'] as const,
   supportedCurrencies: ['USD', 'IDR'] as const,
   exchangeRate: 16000,

@@ -8,7 +8,7 @@ export function FloatingWhatsApp({ phone, message, side, position }: { phone: st
   const [pos, setPos] = useState<{x:number,y:number} | null>(null)
   const [dragging, setDragging] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
 
   useEffect(()=>{
     const saved = localStorage.getItem('wa_pos')
@@ -58,15 +58,15 @@ export function FloatingWhatsApp({ phone, message, side, position }: { phone: st
       {open && (
         <div className="mb-3 w-72 rounded-xl border border-border bg-card shadow-xl overflow-hidden animate-slide-up">
           <div className="bg-[#25D366] text-white p-3 flex items-center justify-between">
-            <div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-white/20 grid place-items-center"><MessageCircle className="h-4 w-4"/></div><div><p className="text-sm font-medium">HotelsIn</p><p className="text-xs opacity-80">Biasanya balas dalam menit</p></div></div>
+            <div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-white/20 grid place-items-center"><MessageCircle className="h-4 w-4"/></div><div><p className="text-sm font-medium">HotelsIn</p><p className="text-xs opacity-80">{locale==='id' ? 'Biasanya balas dalam menit' : 'Usually replies in minutes'}</p></div></div>
             <button onClick={()=> setOpen(false)} className="h-8 w-8 grid place-items-center hover:bg-white/20 rounded-full"><X className="h-4 w-4"/></button>
           </div>
           <div className="p-4 space-y-3">
-            <div className="bg-muted rounded-lg p-3 text-sm">Halo! Ada yang bisa kami bantu? 👋<br/><span className="text-xs text-muted-foreground">Klik untuk chat via WhatsApp</span></div>
+            <div className="bg-muted rounded-lg p-3 text-sm">{locale==='id' ? 'Halo! Ada yang bisa kami bantu? 👋' : 'Hello! How can we help? 👋'}<br/><span className="text-xs text-muted-foreground">{locale==='id' ? 'Klik untuk chat via WhatsApp' : 'Click to chat via WhatsApp'}</span></div>
             <a href={waUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 h-10 bg-[#25D366] text-white rounded-lg text-sm font-medium hover:bg-[#1da851] transition-colors">
-              <MessageCircle className="h-4 w-4"/> Buka WhatsApp
+              <MessageCircle className="h-4 w-4"/> {locale==='id' ? 'Buka WhatsApp' : 'Open WhatsApp'}
             </a>
-            <p className="text-[10px] text-muted-foreground text-center">Drag ikon untuk pindah posisi • snap ke samping</p>
+            <p className="text-[10px] text-muted-foreground text-center">{locale==='id' ? 'Drag ikon untuk pindah posisi • snap ke samping' : 'Drag icon to reposition • snaps to side'}</p>
           </div>
         </div>
       )}

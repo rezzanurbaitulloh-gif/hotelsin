@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle } from 'lucide-react'
+import { getI18nFromCookies } from '@/lib/i18n/server'
+import { formatCurrency, convertCurrency } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,9 +33,14 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
   const propId = props?.[0]?.id
   if (!propId) return <div className="container mx-auto px-6 py-12 text-center text-destructive">Property belum di-setup</div>
 
+  // Respect user's selected currency (from cookie) for storage & display
+  const { currency: selectedCurrency, locale: selectedLocale } = await getI18nFromCookies()
+
   // Server-side price validation — fetch rate from DB, ignore sp.rate (prevent manipulation)
   const { data: rtForPrice } = await supabase.from('room_types').select('base_price').eq('id', roomTypeId).single()
-  const rate = rtForPrice?.base_price || 0
+  const rawRateUSD = rtForPrice?.base_price || 0
+  // Convert to selected currency for storage if needed (DB base is USD)
+  const rate = selectedCurrency === 'IDR' ? Math.round(convertCurrency(rawRateUSD, 'USD', 'IDR')) : rawRateUSD
 
   // Check if already exists (idempotency) — look for recent reservation with same email+dates+room_type in last 10m
   const tenMinsAgo = new Date(Date.now() - 10*60*1000).toISOString()
@@ -97,7 +104,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
     fee_amount: fee,
     discount_amount: 0,
     total_amount: total,
-    currency: 'USD',
+    currency: selectedCurrency,
     confirmation_code: confirmationCode,
   }).select('id,confirmation_code,total_amount,currency').single()
 
@@ -112,7 +119,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
       guest_id: guestId,
       type: 'ROOM_REVENUE',
       amount: total,
-      currency: 'USD',
+      currency: selectedCurrency,
       payment_method: 'CARD',
       status: 'COMPLETED',
       reference: confirmationCode,
@@ -143,7 +150,7 @@ export default async function ConfirmationPage({ searchParams }: { searchParams:
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="font-mono text-2xl tracking-widest">{reservation.confirmation_code}</CardTitle>
-          <Badge variant="secondary" className="mx-auto mt-2">CONFIRMED • {reservation.currency} {Number(reservation.total_amount).toLocaleString()}</Badge>
+          <Badge variant="secondary" className="mx-auto mt-2">CONFIRMED • {formatCurrency(Number(reservation.total_amount), reservation.currency as any, selectedLocale as any)}</Badge>
         </CardHeader>
         <CardContent className="space-y-4 text-sm">
           <div className="grid md:grid-cols-2 gap-4 p-4 bg-muted/30 rounded-lg">

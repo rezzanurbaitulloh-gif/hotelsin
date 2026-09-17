@@ -85,13 +85,22 @@ export function PublicHeader() {
 
           <div className="flex items-center space-x-2 sm:space-x-3">
             <div className="hidden md:flex items-center gap-2">
-              <Select value={locale} onValueChange={(v) => { setLocale(v as typeof locale); setCurrency((v === 'id' ? 'IDR' : 'USD') as typeof currency) }}>
-                <SelectTrigger className="w-[140px] h-9 bg-transparent border-border text-xs tracking-wider">
+              <Select value={locale} onValueChange={(v) => setLocale(v as typeof locale)}>
+                <SelectTrigger className="w-[115px] h-9 bg-transparent border-border text-xs tracking-wider">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">ENGLISH — USD</SelectItem>
-                  <SelectItem value="id">INDONESIA — IDR</SelectItem>
+                  <SelectItem value="en">ENGLISH</SelectItem>
+                  <SelectItem value="id">INDONESIA</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={currency} onValueChange={(v) => setCurrency(v as typeof currency)}>
+                <SelectTrigger className="w-[95px] h-9 bg-transparent border-border text-xs tracking-wider">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="USD">USD $</SelectItem>
+                  <SelectItem value="IDR">IDR Rp</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -104,10 +113,10 @@ export function PublicHeader() {
             {!user ? (
               <div className="hidden sm:flex items-center gap-2">
                 <Button asChild variant="outline" size="sm" className="h-9 px-5 rounded-none text-xs tracking-[0.15em]">
-                  <Link href="/login">MASUK</Link>
+                  <Link href="/login">{t('nav.login')}</Link>
                 </Button>
                 <Button asChild size="sm" className="h-9 px-5 rounded-none bg-brand-foreground text-brand-background text-xs tracking-[0.15em]">
-                  <Link href="/register">DAFTAR</Link>
+                  <Link href="/register">{t('nav.register')}</Link>
                 </Button>
               </div>
             ) : null}
@@ -129,9 +138,28 @@ export function PublicHeader() {
               <DropdownMenuContent align="end" className="w-56">
                 {!user ? (
                   <>
-                    <DropdownMenuItem asChild><Link href="/login" className="flex w-full items-center"><LogOut className="mr-2 h-4 w-4 rotate-180"/>Masuk</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link href="/register" className="flex w-full items-center"><User className="mr-2 h-4 w-4"/>Daftar</Link></DropdownMenuItem>
-                    <p className="px-2 py-1 text-[10px] text-muted-foreground">Belum punya akun? Daftar sekarang</p>
+                    <DropdownMenuItem asChild><Link href="/login" className="flex w-full items-center"><LogOut className="mr-2 h-4 w-4 rotate-180"/>{t('auth.login')}</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href="/register" className="flex w-full items-center"><User className="mr-2 h-4 w-4"/>{t('auth.register')}</Link></DropdownMenuItem>
+                    <p className="px-2 py-1 text-[10px] text-muted-foreground">{t('auth.no_account')} {t('auth.sign_up')}</p>
+                    <DropdownMenuSeparator />
+                    <div className="px-2 py-2 space-y-2 md:hidden">
+                      <p className="text-[10px] tracking-widest text-muted-foreground uppercase">Bahasa</p>
+                      <Select value={locale} onValueChange={(v) => setLocale(v as typeof locale)}>
+                        <SelectTrigger className="w-full h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="en">ENGLISH</SelectItem>
+                          <SelectItem value="id">INDONESIA</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-[10px] tracking-widest text-muted-foreground uppercase">Currency</p>
+                      <Select value={currency} onValueChange={(v) => setCurrency(v as typeof currency)}>
+                        <SelectTrigger className="w-full h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USD">USD $</SelectItem>
+                          <SelectItem value="IDR">IDR Rp</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </>
                 ) : (
                   <>
@@ -156,6 +184,25 @@ export function PublicHeader() {
                       </>
                     )}
                     <DropdownMenuSeparator />
+                    <div className="px-2 py-2 space-y-2 md:hidden">
+                      <p className="text-[10px] tracking-widest text-muted-foreground uppercase">Bahasa</p>
+                      <Select value={locale} onValueChange={(v) => setLocale(v as typeof locale)}>
+                        <SelectTrigger className="w-full h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="en">ENGLISH</SelectItem>
+                          <SelectItem value="id">INDONESIA</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-[10px] tracking-widest text-muted-foreground uppercase">Currency</p>
+                      <Select value={currency} onValueChange={(v) => setCurrency(v as typeof currency)}>
+                        <SelectTrigger className="w-full h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USD">USD $</SelectItem>
+                          <SelectItem value="IDR">IDR Rp</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <DropdownMenuSeparator className="md:hidden" />
                     <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={async ()=>{
                       const { createClient } = await import('@/lib/supabase/client')
                       await createClient().auth.signOut()
