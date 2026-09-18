@@ -35,6 +35,10 @@ export async function POST(req: Request) {
     const { error: updErr } = await service.auth.admin.updateUserById(authUser.id, { password: newPassword })
     if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 })
 
+    const { auditLog } = await import('@/lib/email')
+    const { data: prop } = await service.from('properties').select('id').limit(1).single()
+    await auditLog(service as any, { property_id: (prop as any)?.id || null, actor_email: user.email, actor_role: actorRole, action: 'user.change_password', entity: 'users', entity_id: targetEmail })
+
     return NextResponse.json({ success: true, message: `Password ${targetEmail} diubah` })
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Internal error' }, { status: 500 })

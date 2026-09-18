@@ -59,7 +59,7 @@ function LoginForm(){
       </Button>
       <div className="flex items-center justify-between text-xs">
         <Link href="/register" className="text-muted-foreground hover:text-foreground">Belum punya akun? Daftar</Link>
-        <Link href="#" className="text-muted-foreground hover:text-foreground">Lupa kata sandi?</Link>
+        <Link href="/forgot-password" className="text-muted-foreground hover:text-foreground">Lupa kata sandi?</Link>
       </div>
       <div className="pt-4 border-t border-border">
         <p className="text-xs text-muted-foreground mb-2">Role demo:</p>

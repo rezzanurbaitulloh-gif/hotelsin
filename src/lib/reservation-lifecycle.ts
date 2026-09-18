@@ -1,7 +1,8 @@
-export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'CHECKED_OUT' | 'CANCELLED' | 'NO_SHOW'
+export type ReservationStatus = 'PENDING' | 'PENDING_PAYMENT' | 'CONFIRMED' | 'CHECKED_IN' | 'CHECKED_OUT' | 'CANCELLED' | 'NO_SHOW'
 
 const ALLOWED_TRANSITIONS: Record<ReservationStatus, ReservationStatus[]> = {
-  PENDING: ['CONFIRMED', 'CANCELLED'],
+  PENDING: ['PENDING_PAYMENT', 'CONFIRMED', 'CANCELLED'],
+  PENDING_PAYMENT: ['CONFIRMED', 'CANCELLED'],
   CONFIRMED: ['CHECKED_IN', 'CANCELLED', 'NO_SHOW'],
   CHECKED_IN: ['CHECKED_OUT'],
   CHECKED_OUT: [],
@@ -17,10 +18,10 @@ export function validateTransition(from: ReservationStatus, to: ReservationStatu
   if (!canTransition(from, to)) {
     return { ok: false, reason: `Transisi ${from} → ${to} tidak diizinkan` }
   }
-  // Customer cannot directly set CHECKED_IN/CHECKED_OUT/NO_SHOW, only CANCEL from PENDING/CONFIRMED
+  // Customer cannot directly set CHECKED_IN/CHECKED_OUT/NO_SHOW, only CANCEL from PENDING/PENDING_PAYMENT/CONFIRMED
   if (isCustomer) {
-    if (to === 'CANCELLED' && ['PENDING','CONFIRMED'].includes(from)) return { ok: true }
-    return { ok: false, reason: 'Customer hanya bisa cancel dari PENDING/CONFIRMED' }
+    if (to === 'CANCELLED' && ['PENDING','PENDING_PAYMENT','CONFIRMED'].includes(from)) return { ok: true }
+    return { ok: false, reason: 'Customer hanya bisa cancel dari PENDING/PENDING_PAYMENT/CONFIRMED' }
   }
   // Staff roles: check role permissions
   // FRONT_DESK can do CONFIRMED->CHECKED_IN, CHECKED_IN->CHECKED_OUT, and CANCEL

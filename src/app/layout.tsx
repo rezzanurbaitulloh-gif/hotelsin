@@ -22,21 +22,25 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://hotelsin.vercel.app').replace(/\/$/, '')
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "HotelsIn — A Quieter Way to Arrive",
     template: "%s | HotelsIn",
   },
-  description: "A private sanctuary shaped by architecture, nature and time. Experience luxury hospitality at HotelsIn.",
-  keywords: ["luxury hotel", "boutique hotel", "resort", "spa", "fine dining", "wellness", "travel"],
+  description: "A private sanctuary shaped by architecture, nature and time. Experience luxury hospitality at HotelsIn, Ubud Bali.",
+  keywords: ["luxury hotel", "boutique hotel", "resort", "spa", "fine dining", "wellness", "travel", "hotel ubud", "villa bali"],
   authors: [{ name: "HotelsIn" }],
   creator: "HotelsIn",
   publisher: "HotelsIn",
   robots: "index, follow",
+  alternates: { canonical: SITE_URL },
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://hotelsin.com",
+    url: SITE_URL,
     siteName: "HotelsIn",
     title: "HotelsIn — A Quieter Way to Arrive",
     description: "A private sanctuary shaped by architecture, nature and time.",
@@ -48,6 +52,30 @@ export const metadata: Metadata = {
     description: "A private sanctuary shaped by architecture, nature and time.",
     images: ["/og-image.jpg"],
   },
+};
+
+const HOTEL_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'Hotel',
+  name: 'HotelsIn',
+  description: 'A private sanctuary shaped by architecture, nature and time. Twenty villas in Ubud, Bali.',
+  url: SITE_URL,
+  telephone: '+62 361 975 888',
+  email: 'reservations@hotelsin.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Jalan Raya Ubud No. 88, Sayan',
+    addressLocality: 'Ubud',
+    addressRegion: 'Gianyar, Bali',
+    postalCode: '80571',
+    addressCountry: 'ID',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: -8.5069, longitude: 115.2625 },
+  priceRange: '$$$',
+  checkinTime: '15:00',
+  checkoutTime: '11:00',
+  acceptsReservations: true,
+  currenciesAccepted: 'USD, IDR',
 };
 
 export const viewport: Viewport = {
@@ -64,6 +92,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   const { locale, currency } = await getI18nFromCookies()
   return (
     <html lang={locale} className={`${playfair.variable} ${dmSans.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+      <head>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(HOTEL_JSON_LD) }} />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <Providers initialLocale={locale} initialCurrency={currency}>{children}</Providers>
       </body>

@@ -65,7 +65,7 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
                 <div className="mt-4 flex gap-2">
                   {rt.isAvailable ? (
                     <Button asChild size="sm" className="flex-1 rounded-none bg-brand-foreground text-brand-background h-10 text-xs tracking-widest">
-                      <Link href={`/reserve/guest?room_type=${rt.id}&check_in=${checkIn}&check_out=${checkOut}&guests=${guests}&nights=${nights}&rate=${rt.base_price}`}>PILIH</Link>
+                      <Link href={`/reserve/guest?room_type=${rt.id}&check_in=${checkIn}&check_out=${checkOut}&guests=${guests}&nights=${nights}&rate=${rt.base_price}${sp.promo ? `&promo=${encodeURIComponent(sp.promo)}` : ''}`}>PILIH</Link>
                     </Button>
                   ) : (
                     <Button disabled size="sm" className="flex-1 rounded-none h-10 text-xs">TIDAK TERSEDIA</Button>
