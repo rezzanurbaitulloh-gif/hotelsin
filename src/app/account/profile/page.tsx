@@ -32,8 +32,10 @@ export default async function ProfilePage(){
             <form action={async ()=> {
               'use server'
               const { createClient } = await import('@/lib/supabase/server')
+              const { redirect } = await import('next/navigation')
               const supabase = await createClient()
               await supabase.auth.signOut()
+              redirect('/')
             }}>
               <button className="h-9 px-4 border border-border text-xs tracking-widest hover:bg-muted">LOGOUT</button>
             </form>
@@ -42,7 +44,7 @@ export default async function ProfilePage(){
               <a href="/admin" className="h-9 px-4 bg-brand-accent text-white grid place-items-center text-xs tracking-widest">DASHBOARD</a>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">Foto profil tersimpan di Storage `hotel-images/avatars/` dan `auth.user_metadata.avatar_url`. Header akan langsung menampilkan avatar.</p>
+          <p className="text-xs text-muted-foreground">Foto profil Anda langsung tampil di header setelah diunggah.</p>
         </CardContent>
       </Card>
     </div>

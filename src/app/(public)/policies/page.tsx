@@ -46,6 +46,29 @@ export default function PoliciesPage() {
             <p>• Kerusakan atau kehilangan inventaris akan ditagihkan sesuai nilai penggantian.</p>
           </CardContent>
         </Card>
+        <Card id="privacy" className="scroll-mt-24">
+          <CardHeader><CardTitle>Privasi</CardTitle></CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-2">
+            <p>• Data pribadi (nama, kontak, preferensi) hanya digunakan untuk memproses reservasi dan layanan Anda.</p>
+            <p>• Data pembayaran diproses aman oleh Midtrans (PCI-DSS); kami tidak menyimpan nomor kartu.</p>
+            <p>• Minta penghapusan data kapan saja via reservations@hotelsin.com.</p>
+          </CardContent>
+        </Card>
+        <Card id="terms" className="scroll-mt-24">
+          <CardHeader><CardTitle>Syarat & Ketentuan</CardTitle></CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-2">
+            <p>• Harga dapat berubah hingga pembayaran terkonfirmasi; total final dikunci saat pembayaran.</p>
+            <p>• Reservasi hanya berlaku untuk tamu dan tanggal yang tercantum pada kode konfirmasi.</p>
+            <p>• Force majeure (bencana alam, kebijakan pemerintah) diselesaikan musyawarah, opsi reschedule prioritas.</p>
+          </CardContent>
+        </Card>
+        <Card id="cookies" className="scroll-mt-24">
+          <CardHeader><CardTitle>Cookies</CardTitle></CardHeader>
+          <CardContent className="text-sm text-muted-foreground space-y-2">
+            <p>• Kami memakai cookies esensial (sesi login, bahasa, mata uang) agar website berfungsi.</p>
+            <p>• Tidak ada cookies iklan pihak ketiga. Menonaktifkan cookies dapat mengganggu pemesanan.</p>
+          </CardContent>
+        </Card>
         <div className="text-center">
           <Link href="/reserve" className="inline-block h-11 px-8 bg-brand-foreground text-brand-background items-center text-xs tracking-widest">MULAI RESERVASI</Link>
         </div>

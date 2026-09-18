@@ -11,7 +11,36 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
   const sp = await searchParams
   const checkIn = sp.check_in || new Date(Date.now() + 7*86400000).toISOString().split('T')[0]
   const checkOut = sp.check_out || new Date(Date.now() + 10*86400000).toISOString().split('T')[0]
-  const guests = Number(sp.guests || 2)
+  const guests = Math.min(16, Math.max(1, Number(sp.guests || 2) || 2))
+
+  // Validate dates (WITA)
+  const todayWita = new Date(Date.now() + 8 * 3600 * 1000).toISOString().split('T')[0]
+  const ci = new Date(checkIn).getTime()
+  const co = new Date(checkOut).getTime()
+  if (isNaN(ci) || isNaN(co) || checkOut <= checkIn) {
+    return (
+      <div className="container mx-auto px-6 py-12 text-center">
+        <p className="text-muted-foreground">Tanggal tidak valid — tanggal check-out harus setelah check-in.</p>
+        <Link href="/reserve" className="inline-block mt-4 h-9 px-6 bg-brand-foreground text-brand-background items-center text-xs tracking-widest">PILIH TANGGAL LAGI</Link>
+      </div>
+    )
+  }
+  if (checkIn < todayWita) {
+    return (
+      <div className="container mx-auto px-6 py-12 text-center">
+        <p className="text-muted-foreground">Tanggal check-in sudah lewat. Silakan pilih tanggal mendatang.</p>
+        <Link href="/reserve" className="inline-block mt-4 h-9 px-6 bg-brand-foreground text-brand-background items-center text-xs tracking-widest">PILIH TANGGAL LAGI</Link>
+      </div>
+    )
+  }
+  if ((co - ci) / 86400000 > 90) {
+    return (
+      <div className="container mx-auto px-6 py-12 text-center">
+        <p className="text-muted-foreground">Maksimal 90 malam per reservasi. Hubungi kami untuk long stay.</p>
+        <Link href="/reserve" className="inline-block mt-4 h-9 px-6 bg-brand-foreground text-brand-background items-center text-xs tracking-widest">PILIH TANGGAL LAGI</Link>
+      </div>
+    )
+  }
 
   const supabase = await createClient()
   const { data: roomTypes, error: rtError } = await supabase.from('room_types').select('id,name,base_price,max_occupancy,size_sqm,bed_type,images').eq('is_active', true).order('sort_order')
@@ -37,7 +66,7 @@ export default async function AvailabilityPage({ searchParams }: { searchParams:
       <div className="mb-8">
         <p className="text-xs tracking-[0.35em] text-brand-accent uppercase mb-2">Availability</p>
         <h1 className="font-display text-3xl md:text-4xl font-light">Ketersediaan untuk {checkIn} → {checkOut}</h1>
-        <p className="text-sm text-muted-foreground mt-2">{nights} malam • {guests} tamu • {availability.filter(a=>a.isAvailable).length} tipe tersedia dari {availability.length} • Data real-time dari DB</p>
+        <p className="text-sm text-muted-foreground mt-2">{nights} malam • {guests} tamu • {availability.filter(a=>a.isAvailable).length} tipe tersedia dari {availability.length}</p>
         <div className="mt-4 flex gap-2">
           <Link href={`/reserve?check_in=${checkIn}&check_out=${checkOut}&guests=${guests}`} className="h-9 px-4 border border-border inline-flex items-center text-xs tracking-widest">UBAH TANGGAL</Link>
           <Link href="/stay" className="h-9 px-4 bg-muted inline-flex items-center text-xs tracking-widest">LIHAT SEMUA KAMAR</Link>

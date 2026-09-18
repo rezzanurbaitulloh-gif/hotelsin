@@ -24,7 +24,8 @@ export async function GET(req: Request) {
   }
 
   const supabase = createServiceClient()
-  const today = new Date().toISOString().split('T')[0]
+  // Property timezone: WITA (Asia/Makassar, UTC+8)
+  const today = new Date(Date.now() + 8 * 3600 * 1000).toISOString().split('T')[0]
   const now = new Date().toISOString()
 
   // 1. Auto check-in: CONFIRMED where check_in <= today and check_in <= now, and status is CONFIRMED -> CHECKED_IN

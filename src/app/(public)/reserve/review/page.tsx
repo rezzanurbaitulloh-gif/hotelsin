@@ -73,7 +73,7 @@ export default async function ReviewPage({ searchParams }: { searchParams: Promi
         <Card>
           <CardHeader><CardTitle className="text-sm">Rincian Biaya</CardTitle></CardHeader>
           <CardContent className="space-y-2 text-sm">
-            <div className="flex justify-between"><span>{tr('booking.room_rate')} × {tr('booking.nights')}</span><span><Price amount={price.rate} /> × {nights} = <Price amount={price.subtotal} /></span></div>
+            <div className="flex justify-between"><span>{tr('booking.room_rate')} × {tr('booking.nights')}</span><span><Price amount={price.rate} originalCurrency={currency} /> × {nights} = <Price amount={price.subtotal} originalCurrency={currency} /></span></div>
             {addons.length > 0 && (
               <div className="border-t border-border pt-2 space-y-1">
                 {addons.map((a, i) => (
@@ -81,21 +81,21 @@ export default async function ReviewPage({ searchParams }: { searchParams: Promi
                     <span>+ {addonName.get(a.addonId) || 'Add-on'} × {a.qty}</span>
                   </div>
                 ))}
-                <div className="flex justify-between"><span>Add-ons</span><span><Price amount={price.addonsTotal} /></span></div>
+                <div className="flex justify-between"><span>Add-ons</span><span><Price amount={price.addonsTotal} originalCurrency={currency} /></span></div>
               </div>
             )}
             {price.discount > 0 && (
               <div className="flex justify-between text-emerald-700">
                 <span>{tr('booking.discount')}{price.appliedOfferName ? ` (${price.appliedOfferName})` : ''}{price.loyaltyDiscount > 0 ? ' + member' : ''}</span>
-                <span>−<Price amount={price.discount} /></span>
+                <span>−<Price amount={price.discount} originalCurrency={currency} /></span>
               </div>
             )}
             {promoCode && price.discount === 0 && (
               <p className="text-xs text-destructive">{tr('booking.promo_invalid')}: {promoCode}</p>
             )}
-            <div className="flex justify-between text-muted-foreground"><span>{tr('booking.taxes')} 11%</span><span><Price amount={price.tax} /></span></div>
-            <div className="flex justify-between text-muted-foreground"><span>{tr('booking.fees')} 5%</span><span><Price amount={price.fee} /></span></div>
-            <div className="flex justify-between font-medium border-t border-border pt-2"><span>{tr('booking.total')}</span><span className="font-display text-lg"><Price amount={price.total} /></span></div>
+            <div className="flex justify-between text-muted-foreground"><span>{tr('booking.taxes')} 11%</span><span><Price amount={price.tax} originalCurrency={currency} /></span></div>
+            <div className="flex justify-between text-muted-foreground"><span>{tr('booking.fees')} 5%</span><span><Price amount={price.fee} originalCurrency={currency} /></span></div>
+            <div className="flex justify-between font-medium border-t border-border pt-2"><span>{tr('booking.total')}</span><span className="font-display text-lg"><Price amount={price.total} originalCurrency={currency} /></span></div>
             <p className="text-xs text-muted-foreground mt-2">Mata uang mengikuti pilihan Anda ({currency}). Pembayaran diproses aman via Midtrans (QRIS, VA, e-wallet, kartu).</p>
           </CardContent>
         </Card>

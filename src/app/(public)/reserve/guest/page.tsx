@@ -8,7 +8,6 @@ import { Badge } from '@/components/ui/badge'
 import { Price } from '@/components/price'
 import { LocalizedText, T } from '@/components/localized'
 import { getI18nFromCookies, getTranslationServer } from '@/lib/i18n/server'
-import { convertCurrency } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -100,7 +99,7 @@ export default async function GuestPage({ searchParams }: { searchParams: Promis
                 <span className="flex-1">
                   <span className="flex items-center justify-between gap-2">
                     <strong className="text-sm"><LocalizedText value={a.name} /></strong>
-                    <Price amount={currency === 'IDR' ? Math.round(convertCurrency(Number(a.price), 'USD', 'IDR')) : Number(a.price)} />
+                    <Price amount={Number(a.price)} />
                   </span>
                   <span className="block text-xs text-muted-foreground mt-1"><LocalizedText value={a.description} /></span>
                   <Badge variant="outline" className="mt-2 text-[10px]">

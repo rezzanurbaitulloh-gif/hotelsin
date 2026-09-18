@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { User, Upload, Eye } from 'lucide-react'
@@ -9,26 +8,28 @@ export function AvatarUpload({ initialUrl, email }: { initialUrl?: string | null
   const [url, setUrl] = useState(initialUrl || '')
   const [uploading, setUploading] = useState(false)
   const [preview, setPreview] = useState<string | null>(initialUrl || null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    if (file.size > 5 * 1024 * 1024) { alert('Maks 5MB'); return }
+    if (file.size > 5 * 1024 * 1024) { setError('Maksimal 5MB'); return }
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { setError('Hanya JPG/PNG/WEBP'); return }
     setUploading(true)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { alert('Harus login'); setUploading(false); return }
-    const ext = file.name.split('.').pop()
-    const path = `avatars/${user.id}-${Date.now()}.${ext}`
-    const { error: upErr } = await supabase.storage.from('hotel-images').upload(path, file, { upsert: true })
-    if (upErr) { alert('Upload gagal: ' + upErr.message); setUploading(false); return }
-    const { data: { publicUrl } } = supabase.storage.from('hotel-images').getPublicUrl(path)
-    const { error: updErr } = await supabase.auth.updateUser({ data: { avatar_url: publicUrl } })
-    if (updErr) { alert('Gagal update profile: ' + updErr.message); setUploading(false); return }
-    setPreview(publicUrl)
-    setUrl(publicUrl)
-    setUploading(false)
-    window.location.reload()
+    setError(null)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/upload/avatar', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data?.error || 'Upload gagal')
+      setPreview(data.url)
+      setUrl(data.url)
+      window.location.reload()
+    } catch (err: any) {
+      setError(err?.message || 'Upload gagal')
+      setUploading(false)
+    }
   }
 
   return (
@@ -51,7 +52,8 @@ export function AvatarUpload({ initialUrl, email }: { initialUrl?: string | null
             <Upload className="mr-2 h-4 w-4"/>{uploading ? '...' : 'Upload'}
           </Button>
         </div>
-        <p className="text-[10px] text-muted-foreground">JPG/PNG/WEBP, maks 5MB. Tersimpan di Supabase Storage `hotel-images/avatars/` dan `auth.user_metadata.avatar_url`. Header akan langsung pakai avatar.</p>
+        {error && <p className="text-xs text-destructive bg-destructive/10 p-2 rounded">{error}</p>}
+        <p className="text-[10px] text-muted-foreground">JPG/PNG/WEBP, maks 5MB. Foto profil langsung tampil di header.</p>
         {url && <a href={url} target="_blank" className="text-xs text-brand-accent hover:underline flex items-center gap-1"><Eye className="h-3 w-3"/>Lihat foto</a>}
         <p className="text-xs text-muted-foreground">Email: {email}</p>
       </div>

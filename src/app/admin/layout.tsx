@@ -110,7 +110,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
         <header className="h-14 border-b border-border bg-card flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)}>
+            <Button variant="ghost" size="icon" aria-label="Menu" className="lg:hidden" onClick={() => setOpen(!open)}>
               {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
             <h1 className="font-medium text-sm tracking-wide hidden sm:block">

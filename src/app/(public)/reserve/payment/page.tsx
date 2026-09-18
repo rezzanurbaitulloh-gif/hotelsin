@@ -47,6 +47,21 @@ export default async function PaymentPage({ searchParams }: { searchParams: Prom
     )
   }
 
+  // Validate dates server-side (never trust query params)
+  {
+    const todayWita = new Date(Date.now() + 8 * 3600 * 1000).toISOString().split('T')[0]
+    const ci = new Date(checkIn).getTime()
+    const co = new Date(checkOut).getTime()
+    if (isNaN(ci) || isNaN(co) || checkOut <= checkIn || checkIn < todayWita || (co - ci) / 86400000 > 90) {
+      return (
+        <div className="container mx-auto px-6 py-12 text-center">
+          <p className="text-muted-foreground">Tanggal menginap tidak valid.</p>
+          <Link href="/reserve" className="text-brand-accent underline">Pilih tanggal lagi</Link>
+        </div>
+      )
+    }
+  }
+
   const { data: props } = await supabase.from('properties').select('id').limit(1)
   const propId = (props as any)?.[0]?.id
   if (!propId) return <div className="container mx-auto px-6 py-12 text-center text-destructive">Property belum di-setup</div>
@@ -195,7 +210,7 @@ export default async function PaymentPage({ searchParams }: { searchParams: Prom
         <CardHeader className="text-center">
           <CardTitle className="font-mono text-xl tracking-widest">{confirmationCode}</CardTitle>
           <p className="text-xs text-muted-foreground mt-1"><LocalizedText value={(roomType as any)?.name as any} /> • {checkIn} → {checkOut} • {nights} malam</p>
-          <p className="font-display text-3xl mt-3"><Price amount={price.total} /></p>
+          <p className="font-display text-3xl mt-3"><Price amount={price.total} originalCurrency={currency} /></p>
           <p className="text-[10px] text-muted-foreground">Ditagih via Midtrans: Rp{grossIdr.toLocaleString('id-ID')} • {tr('booking.expiry_note')}</p>
         </CardHeader>
         <CardContent>

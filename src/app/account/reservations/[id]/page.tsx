@@ -61,10 +61,10 @@ export default async function ReservationDetailPage({ params }: { params: Promis
         <CardContent className="space-y-4 text-sm">
           <div className="grid gap-4 md:grid-cols-2">
             <div><p className="text-xs tracking-widest text-muted-foreground uppercase">Tamu</p><p className="font-medium">{(guest as any)?.first_name} {(guest as any)?.last_name}</p><p className="text-xs text-muted-foreground">{(guest as any)?.email}</p></div>
-            <div><p className="text-xs tracking-widest text-muted-foreground uppercase">Tanggal</p><p>{(r as any).check_in} → {(r as any).check_out} • {(r as any).nights} malam</p><p className="text-xs text-muted-foreground">{(r as any).adults} tamu • <Price amount={Number((r as any).room_rate)} />/malam</p></div>
+            <div><p className="text-xs tracking-widest text-muted-foreground uppercase">Tanggal</p><p>{(r as any).check_in} → {(r as any).check_out} • {(r as any).nights} malam</p><p className="text-xs text-muted-foreground">{(r as any).adults} tamu • <Price amount={Number((r as any).room_rate)} originalCurrency={(r as any).currency} />/malam</p></div>
           </div>
           <div className="pt-4 border-t border-border flex justify-between items-center">
-            <span className="font-medium">Total</span><span className="font-display text-xl"><Price amount={Number((r as any).total_amount)} /></span>
+            <span className="font-medium">Total</span><span className="font-display text-xl"><Price amount={Number((r as any).total_amount)} originalCurrency={(r as any).currency} /></span>
           </div>
           {canCancel ? (
             <form action={cancelReservation}>

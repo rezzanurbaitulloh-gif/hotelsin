@@ -113,7 +113,7 @@ export function PublicHeader() {
             ) : null}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 relative overflow-hidden">
+                <Button variant="ghost" size="icon" aria-label="Akun" className="h-9 w-9 relative overflow-hidden">
                   {user?.user_metadata?.avatar_url ? (
                     <img src={user.user_metadata.avatar_url} alt="avatar" className="h-8 w-8 rounded-full object-cover" />
                   ) : user ? (

@@ -37,6 +37,21 @@ export async function POST(req: Request) {
     const propId = (props as any)?.id
     if (!propId) return NextResponse.json({ error: 'Property belum di-setup' }, { status: 500 })
 
+    // Anti-spam: tolak duplikat identik 24 jam terakhir
+    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+    const { data: dup } = await service
+      .from('reviews')
+      .select('id')
+      .eq('property_id', propId)
+      .eq('guest_name', String(body.guest_name).slice(0, 200))
+      .eq('comment', String(body.comment))
+      .gte('created_at', dayAgo)
+      .limit(1)
+      .maybeSingle()
+    if ((dup as any)?.id) {
+      return NextResponse.json({ error: 'Ulasan serupa sudah dikirim. Tunggu moderasi.' }, { status: 429 })
+    }
+
     // Link guest if logged in
     const { data: { user } } = await supabase.auth.getUser()
     let guestId: string | null = null
