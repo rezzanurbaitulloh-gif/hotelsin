@@ -23,7 +23,7 @@ const navigation = [
 
 export function PublicHeader() {
   const pathname = usePathname()
-  const { locale, currency, setLocale, setCurrency, t } = useI18n()
+  const { locale, setLocale, t } = useI18n()
   const [user, setUser] = React.useState<any>(null)
   const [role, setRole] = React.useState<string | null>(null)
   const [isCoreRole, setIsCoreRole] = React.useState(false)
@@ -86,21 +86,12 @@ export function PublicHeader() {
           <div className="flex items-center space-x-2 sm:space-x-3">
             <div className="hidden md:flex items-center gap-2">
               <Select value={locale} onValueChange={(v) => setLocale(v as typeof locale)}>
-                <SelectTrigger className="w-[115px] h-9 bg-transparent border-border text-xs tracking-wider">
+                <SelectTrigger className="w-[160px] h-9 bg-transparent border-border text-xs tracking-wider">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">ENGLISH</SelectItem>
-                  <SelectItem value="id">INDONESIA</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={currency} onValueChange={(v) => setCurrency(v as typeof currency)}>
-                <SelectTrigger className="w-[95px] h-9 bg-transparent border-border text-xs tracking-wider">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD $</SelectItem>
-                  <SelectItem value="IDR">IDR Rp</SelectItem>
+                  <SelectItem value="en">ENGLISH — USD</SelectItem>
+                  <SelectItem value="id">INDONESIA — IDR</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -147,16 +138,8 @@ export function PublicHeader() {
                       <Select value={locale} onValueChange={(v) => setLocale(v as typeof locale)}>
                         <SelectTrigger className="w-full h-8 text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="en">ENGLISH</SelectItem>
-                          <SelectItem value="id">INDONESIA</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-[10px] tracking-widest text-muted-foreground uppercase">Currency</p>
-                      <Select value={currency} onValueChange={(v) => setCurrency(v as typeof currency)}>
-                        <SelectTrigger className="w-full h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="USD">USD $</SelectItem>
-                          <SelectItem value="IDR">IDR Rp</SelectItem>
+                          <SelectItem value="en">ENGLISH — USD</SelectItem>
+                          <SelectItem value="id">INDONESIA — IDR</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -189,16 +172,8 @@ export function PublicHeader() {
                       <Select value={locale} onValueChange={(v) => setLocale(v as typeof locale)}>
                         <SelectTrigger className="w-full h-8 text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="en">ENGLISH</SelectItem>
-                          <SelectItem value="id">INDONESIA</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-[10px] tracking-widest text-muted-foreground uppercase">Currency</p>
-                      <Select value={currency} onValueChange={(v) => setCurrency(v as typeof currency)}>
-                        <SelectTrigger className="w-full h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="USD">USD $</SelectItem>
-                          <SelectItem value="IDR">IDR Rp</SelectItem>
+                          <SelectItem value="en">ENGLISH — USD</SelectItem>
+                          <SelectItem value="id">INDONESIA — IDR</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
