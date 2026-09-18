@@ -1,7 +1,9 @@
 import { createHash } from 'crypto'
 
 // Helper SERVER-ONLY Midtrans (jangan import di client component).
-// Key produksi dari projek catering (proven working vs app.midtrans.com).
+// Key dari projek catering/internal-travel — valid di SANDBOX
+// (app.sandbox.midtrans.com). Untuk produksi, ganti key + set
+// MIDTRANS_IS_PRODUCTION=true di env.
 
 function isProduction(): boolean {
   return (process.env.MIDTRANS_IS_PRODUCTION ?? 'true') !== 'false'
